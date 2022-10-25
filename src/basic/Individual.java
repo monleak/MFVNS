@@ -35,9 +35,20 @@ public class Individual {
 
     public void calCost(Problem prob, int idGraph){
         skillfactor = idGraph;
-        int point1=0,point2=0;
+        cost = 0;
+        //TODO: kiểm tra lại hàm Individual.calCost
+        int point1=0,point2=1;
         for(int i=0;i<prob.graphs.get(idGraph).totalVertices - 1;i++){
-
+            while (point1 < prob.graphs.get(idGraph).totalVertices - 1
+                    || Chromosome[point1] > prob.graphs.get(idGraph).totalVertices - 1){
+                point1++;
+            }
+            while (point2 < prob.graphs.get(idGraph).totalVertices
+                    || Chromosome[point2] > prob.graphs.get(idGraph).totalVertices
+                    || point2 <= point1){
+                point2++;
+            }
+            this.cost += prob.graphs.get(idGraph).distance[Chromosome[point1]][Chromosome[point2]];
         }
     }
 }

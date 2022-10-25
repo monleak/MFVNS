@@ -22,5 +22,6 @@ public class Main {
         Params.rand = new Random();
         Individual a = new Individual();
         a.init();
+        a.calCost(prob,0);
     }
 }

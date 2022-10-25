@@ -39,5 +39,10 @@ public class Problem {
         testCase.add(new int[]{0,1,3,4,6,7});
 
         testCase.add(new int[]{0,1,2,3,4,5,6,7});
+
+        for(Graph g: graphs){
+            if(Params.maxTotalVertices < g.totalVertices)
+                Params.maxTotalVertices = g.totalVertices;
+        }
     }
 }

@@ -18,11 +18,7 @@ public class Individual {
 
     public Individual(){
         Chromosome = new int[Params.maxTotalVertices];
-        int i = 0;
-        while(i<Params.maxTotalVertices){
-            Chromosome[i] = i;
-            i++;
-        }
+        Arrays.fill(Chromosome,-1);
 
         rank = -1;
         cost = -1;
@@ -30,25 +26,27 @@ public class Individual {
     }
 
     public void init(){
+        int i = 0;
+        while(i<Params.maxTotalVertices){
+            Chromosome[i] = i;
+            i++;
+        }
+
         shuffleArray(Chromosome);
     }
 
     public void calCost(Problem prob, int idGraph){
-        skillfactor = idGraph;
         cost = 0;
-        //TODO: kiểm tra lại hàm Individual.calCost
-        int point1=0,point2=1;
-        for(int i=0;i<prob.graphs.get(idGraph).totalVertices - 1;i++){
-            while (point1 < prob.graphs.get(idGraph).totalVertices - 1
-                    || Chromosome[point1] > prob.graphs.get(idGraph).totalVertices - 1){
-                point1++;
+        int[] decodeChromosome = new int[prob.graphs.get(idGraph).totalVertices];
+        int count=0;
+        for (int i=0;i<Chromosome.length;i++){
+            if(Chromosome[i] < prob.graphs.get(idGraph).totalVertices){
+                decodeChromosome[count++] = Chromosome[i];
             }
-            while (point2 < prob.graphs.get(idGraph).totalVertices
-                    || Chromosome[point2] > prob.graphs.get(idGraph).totalVertices
-                    || point2 <= point1){
-                point2++;
-            }
-            this.cost += prob.graphs.get(idGraph).distance[Chromosome[point1]][Chromosome[point2]];
+        }
+
+        for(int i=0;i<decodeChromosome.length-1;i++){
+            cost += prob.graphs.get(idGraph).distance[decodeChromosome[i]][decodeChromosome[i+1]];
         }
     }
 }

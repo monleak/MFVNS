@@ -44,5 +44,6 @@ public class Problem {
             if(Params.maxTotalVertices < g.totalVertices)
                 Params.maxTotalVertices = g.totalVertices;
         }
+        Params.kmax = (int) Params.maxTotalVertices/10;
     }
 }

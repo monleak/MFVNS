@@ -2,6 +2,7 @@ package main;
 
 import basic.Individual;
 import basic.Params;
+import basic.TSP_Population;
 import benchmark.Graph;
 import benchmark.Problem;
 
@@ -19,9 +20,10 @@ public class Main {
 //
 //            }
 //        }
+
         Params.rand = new Random();
-        Individual a = new Individual();
-        a.init();
-        a.calCost(prob,0);
+        TSP_Population pop = new TSP_Population(prob,0);
+        pop.init();
+        pop.update();
     }
 }

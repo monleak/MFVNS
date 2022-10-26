@@ -5,6 +5,8 @@ import java.util.Random;
 public class Params {
     public static String linkData = "Data//";
     public static int maxTotalVertices = 0;
+    public static int POP_SIZE= 200;
+    public static int kmax ;
     public static Random rand; //Được khởi tạo theo các seed
     public static int countEvals; //Đếm số lần đánh giá
     public static int recordsNum; //Số lần ghi lại kết quả

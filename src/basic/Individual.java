@@ -10,7 +10,7 @@ import java.util.Collections;
 
 import static util.util.shuffleArray;
 
-public class Individual {
+public class Individual  implements Comparable<Individual> {
     public int[] Chromosome;
     public double cost;
     public int skillfactor;
@@ -48,5 +48,11 @@ public class Individual {
         for(int i=0;i<decodeChromosome.length-1;i++){
             cost += prob.graphs.get(idGraph).distance[decodeChromosome[i]][decodeChromosome[i+1]];
         }
+        cost += prob.graphs.get(idGraph).distance[decodeChromosome[decodeChromosome.length-1]][decodeChromosome[0]];
+    }
+
+    @Override
+    public int compareTo(Individual o) {
+        return Double.valueOf(this.cost).compareTo(o.cost);
     }
 }

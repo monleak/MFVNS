@@ -41,8 +41,8 @@ public class MFVNS {
             pop.update(best);
 
             System.out.print(count+": ");
-            for (double a: best) {
-                System.out.print(a+" ");
+            for (int i=0;i<prob.testCase.get(testCase).length;i++) {
+                System.out.print(best[prob.testCase.get(testCase)[i]]+" ");
             }
             System.out.print("\n");
             count++;

@@ -25,19 +25,20 @@ public class TSP_Population {
         }
     }
 
-    public void update(){
+    public void update(double[] best){
         for (int skillfactor = 0;skillfactor < prob.testCase.get(testCase).length;skillfactor++){
             //Tính cost và xếp rank các cá thể theo từng graph
             for(int idIndiv = 0;idIndiv < pop.size();idIndiv++){
                 pop.get(idIndiv).calCost(prob,prob.testCase.get(testCase)[skillfactor]);
             }
-            sortPop();
+            sortPop(skillfactor);
             for(int idIndiv = 0;idIndiv < pop.size();idIndiv++){
                 if(pop.get(idIndiv).rank == -1 || pop.get(idIndiv).rank > idIndiv){
                     pop.get(idIndiv).rank = idIndiv;
                     pop.get(idIndiv).skillfactor = skillfactor;
                 }
             }
+            best[skillfactor] = pop.get(0).cost[skillfactor];
         }
         sortPopByRank();
 
@@ -45,12 +46,12 @@ public class TSP_Population {
             pop.remove(pop.size()-1);
         }
     }
-    public void sortPop() {
+    public void sortPop(int idGraph) {
         //Sắp xếp lại các cá thể trong quần thể
         this.pop.sort(new Comparator<Individual>() {
             @Override
             public int compare(Individual o1, Individual o2) {
-                return Double.valueOf(o1.cost).compareTo(o2.cost);
+                return Double.valueOf(o1.cost[idGraph]).compareTo(o2.cost[idGraph]);
             }
         });
     }

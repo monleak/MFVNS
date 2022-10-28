@@ -14,4 +14,28 @@ public class util {
             ar[i] = a;
         }
     }
+
+    public static int[] decodeChromosome(int[] Chromosome, int totalVertices){
+        int[] decodeChromosome = new int[totalVertices];
+        int count=0;
+        for (int i=0;i<Chromosome.length;i++){
+            if(Chromosome[i] < totalVertices){
+                decodeChromosome[count++] = Chromosome[i];
+            }
+        }
+        return decodeChromosome;
+    }
+
+    public static int[] codeChromosome(int[] decodeChromosome, int[] previousChromosome){
+        int[] newChromosome = new int[Params.maxTotalVertices];
+        int countDecode = 0;
+        for(int i=0;i<newChromosome.length;i++){
+            if(previousChromosome[i] >= decodeChromosome.length){
+                newChromosome[i] = previousChromosome[i];
+            }else {
+                newChromosome[i] = decodeChromosome[countDecode++];
+            }
+        }
+        return newChromosome;
+    }
 }

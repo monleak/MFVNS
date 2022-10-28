@@ -2,6 +2,7 @@ package basic;
 
 import benchmark.Graph;
 import benchmark.Problem;
+import util.util;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import static util.util.shuffleArray;
 
 public class Individual  implements Comparable<Individual> {
     public int[] Chromosome;
-    public double cost;
+    public double[] cost;
     public int skillfactor;
     public int rank;
 
@@ -21,7 +22,9 @@ public class Individual  implements Comparable<Individual> {
         Arrays.fill(Chromosome,-1);
 
         rank = -1;
-        cost = -1;
+
+        cost = new double[8];
+        Arrays.fill(cost,-1);
         skillfactor = -1;
     }
 
@@ -36,23 +39,18 @@ public class Individual  implements Comparable<Individual> {
     }
 
     public void calCost(Problem prob, int idGraph){
-        cost = 0;
-        int[] decodeChromosome = new int[prob.graphs.get(idGraph).totalVertices];
-        int count=0;
-        for (int i=0;i<Chromosome.length;i++){
-            if(Chromosome[i] < prob.graphs.get(idGraph).totalVertices){
-                decodeChromosome[count++] = Chromosome[i];
-            }
-        }
+        cost[idGraph] = 0;
+        int[] decodeChromosome = util.decodeChromosome(Chromosome,prob.graphs.get(idGraph).totalVertices);
 
         for(int i=0;i<decodeChromosome.length-1;i++){
-            cost += prob.graphs.get(idGraph).distance[decodeChromosome[i]][decodeChromosome[i+1]];
+            cost[idGraph] += prob.graphs.get(idGraph).distance[decodeChromosome[i]][decodeChromosome[i+1]];
         }
-        cost += prob.graphs.get(idGraph).distance[decodeChromosome[decodeChromosome.length-1]][decodeChromosome[0]];
+        cost[idGraph] += prob.graphs.get(idGraph).distance[decodeChromosome[decodeChromosome.length-1]][decodeChromosome[0]];
+        Params.countEvals++;
     }
 
     @Override
     public int compareTo(Individual o) {
-        return Double.valueOf(this.cost).compareTo(o.cost);
+        return Double.valueOf(this.cost[0]).compareTo(o.cost[0]);
     }
 }

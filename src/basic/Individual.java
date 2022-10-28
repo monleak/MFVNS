@@ -27,6 +27,15 @@ public class Individual  implements Comparable<Individual> {
         Arrays.fill(cost,-1);
         skillfactor = -1;
     }
+    public Individual(int[] Chromosome, double cost,int skillfactor){
+        this.Chromosome = Chromosome;
+        rank = -1;
+
+        this.cost = new double[8];
+        Arrays.fill(this.cost,-1);
+        this.cost[skillfactor] = cost;
+        this.skillfactor = skillfactor;
+    }
 
     public void init(){
         int i = 0;

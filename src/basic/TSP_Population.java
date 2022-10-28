@@ -38,7 +38,9 @@ public class TSP_Population {
                     pop.get(idIndiv).skillfactor = skillfactor;
                 }
             }
-            best[skillfactor] = pop.get(0).cost[skillfactor];
+            if(best[skillfactor] > pop.get(0).cost[skillfactor]){
+                best[skillfactor] = pop.get(0).cost[skillfactor];
+            }
         }
         sortPopByRank();
 

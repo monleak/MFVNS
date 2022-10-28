@@ -64,25 +64,46 @@ public class MFVNS {
         return x;
     }
     public boolean localSearch(Individual indiv, int k){
-
-        int[] path = decodeChromosome(Shaking(indiv.Chromosome,k),prob.graphs.get(indiv.skillfactor).totalVertices);
-
+        int[] path = Shaking(indiv.Chromosome,k);
         int i = Params.rand.nextInt(path.length-2);
         int j = Math.min(i+5,path.length-1);
-
         path = do_2_Opt(path, i, j);
-        double pathLength = 0;
-        for(int x=0;x<path.length-1;x++){
-            pathLength += prob.graphs.get(indiv.skillfactor).distance[path[x]][path[x+1]];
-        }
-        pathLength += prob.graphs.get(indiv.skillfactor).distance[path[path.length-1]][path[0]];
-        Params.countEvals++;
 
-        double lengthDelta = pathLength - indiv.cost[indiv.skillfactor];
-        if (lengthDelta < 0) {
-            indiv.Chromosome = codeChromosome(path,indiv.Chromosome);
-            indiv.cost[indiv.skillfactor] = pathLength;
-            return true;
+        //*****indiv.skillfactor*******
+        do{
+            int[] decodePath = decodeChromosome(path,prob.graphs.get(indiv.skillfactor).totalVertices);
+            double pathLength = 0;
+            for(int x=0;x<decodePath.length-1;x++){
+                pathLength += prob.graphs.get(indiv.skillfactor).distance[decodePath[x]][decodePath[x+1]];
+            }
+            pathLength += prob.graphs.get(indiv.skillfactor).distance[decodePath[decodePath.length-1]][decodePath[0]];
+            Params.countEvals++;
+
+            double lengthDelta = pathLength - indiv.cost[indiv.skillfactor];
+            if (lengthDelta < 0) {
+                Individual o = new Individual(codeChromosome(decodePath,indiv.Chromosome),pathLength,indiv.skillfactor);
+                this.pop.pop.add(o);
+                return true;
+            }
+        }while (false);
+        //*****************************
+
+        for (int idGraph = 0;idGraph < prob.testCase.get(testCase).length;idGraph++){
+            if(idGraph == indiv.skillfactor) continue;
+            int[] decodePath = decodeChromosome(path,prob.graphs.get(idGraph).totalVertices);
+            double pathLength = 0;
+            for(int x=0;x<decodePath.length-1;x++){
+                pathLength += prob.graphs.get(idGraph).distance[decodePath[x]][decodePath[x+1]];
+            }
+            pathLength += prob.graphs.get(idGraph).distance[decodePath[decodePath.length-1]][decodePath[0]];
+            Params.countEvals++;
+
+            double lengthDelta = pathLength - indiv.cost[idGraph];
+            if (lengthDelta < 0) {
+                Individual o = new Individual(codeChromosome(decodePath,indiv.Chromosome),pathLength,idGraph);
+                this.pop.pop.add(o);
+                return true;
+            }
         }
         return false;
     }

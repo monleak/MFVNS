@@ -25,28 +25,51 @@ public class TSP_Population {
         }
     }
 
-    public void update(double[] best){
-        for (int skillfactor = 0;skillfactor < prob.testCase.get(testCase).length;skillfactor++){
+    public void setting(double[] best){
+        //Set skillfactor
+        for (int elementTestCase = 0;elementTestCase < prob.testCase.get(testCase).length;elementTestCase++){
             //Tính cost và xếp rank các cá thể theo từng graph
             for(int idIndiv = 0;idIndiv < pop.size();idIndiv++){
-                pop.get(idIndiv).calCost(prob,prob.testCase.get(testCase)[skillfactor]);
+                pop.get(idIndiv).calCost(prob,prob.testCase.get(testCase)[elementTestCase]);
             }
-            sortPop(skillfactor);
+            sortPop(prob.testCase.get(testCase)[elementTestCase]);
             for(int idIndiv = 0;idIndiv < pop.size();idIndiv++){
                 if(pop.get(idIndiv).rank == -1 || pop.get(idIndiv).rank > idIndiv){
                     pop.get(idIndiv).rank = idIndiv;
-                    pop.get(idIndiv).skillfactor = skillfactor;
+                    pop.get(idIndiv).skillfactor = prob.testCase.get(testCase)[elementTestCase];
                 }
             }
-            if(best[skillfactor] > pop.get(0).cost[skillfactor]){
-                best[skillfactor] = pop.get(0).cost[skillfactor];
+            if(best[prob.testCase.get(testCase)[elementTestCase]] > pop.get(0).cost[prob.testCase.get(testCase)[elementTestCase]]){
+                best[prob.testCase.get(testCase)[elementTestCase]] = pop.get(0).cost[prob.testCase.get(testCase)[elementTestCase]];
             }
         }
         sortPopByRank();
-
-        while (pop.size() > Params.POP_SIZE){
-            pop.remove(pop.size()-1);
+    }
+    public void reSizePop(){
+        int maxPopSize = pop.size();
+        int maxSizePerTask = maxPopSize / prob.testCase.get(testCase).length;
+        ArrayList<Individual> tempPop = new ArrayList<>();
+        for (int elementTestCase = 0;elementTestCase < prob.testCase.get(testCase).length;elementTestCase++){
+            int count = 0;
+            sortPop(prob.testCase.get(testCase)[elementTestCase]);
+            while (count<maxSizePerTask){
+                for (int i = 0;i<pop.size();i++){
+                    if(pop.get(i).skillfactor==prob.testCase.get(testCase)[elementTestCase]){
+                        tempPop.add(pop.get(i));
+                        pop.remove(i);
+                        count++;
+                        break;
+                    }
+                }
+            }
         }
+
+        sortPop(prob.testCase.get(testCase)[Params.rand.nextInt(prob.testCase.get(testCase).length)]);
+        while(tempPop.size() < maxPopSize){
+            tempPop.add(pop.get(0));
+        }
+
+        this.pop = tempPop;
     }
     public void sortPop(int idGraph) {
         //Sắp xếp lại các cá thể trong quần thể

@@ -6,6 +6,8 @@ import basic.TSP_Population;
 import benchmark.Problem;
 
 import java.awt.*;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import static util.util.codeChromosome;
@@ -17,6 +19,7 @@ public class MFVNS {
     public double[] best;
     public Problem prob;
     public int testCase;
+
     public MFVNS(Problem prob, int testCase){
         this.prob = prob;
         this.testCase = testCase;
@@ -25,20 +28,25 @@ public class MFVNS {
 
         pop = new TSP_Population(prob,testCase);
         pop.init();
-        pop.update(best);
+        pop.setting(best);
     }
     public void run(){
         int count = 0;
-        while (Params.countEvals < Params.maxEvals){
+        while (count < Params.maxGeneration/*Params.countEvals < Params.maxEvals*/){
             for(int i=0;i<pop.pop.size();i++){
-                for (int k=0;k<Params.kmax;k++){
-                    if(localSearch(pop.pop.get(i),k)){
-                        break;
-                    }
-                }
-
+                localSearch(pop.pop.get(i));
             }
-            pop.update(best);
+
+            //TODO: thưc hiện lai ghép để transfer
+            for(int i=0;i<pop.pop.size();i++){
+                Individual indiv;
+                do{
+                    indiv = pop.pop.get(Params.rand.nextInt(pop.pop.size()));
+                }while (indiv.id == pop.pop.get(i).id);
+
+                SBXandAddPop(pop.pop.get(i),indiv);
+            }
+            pop.reSizePop();
 
             System.out.print(count+": ");
             for (int i=0;i<prob.testCase.get(testCase).length;i++) {
@@ -48,64 +56,135 @@ public class MFVNS {
             count++;
         }
     }
-    public int[] Shaking(int[] Chromosome, int k){
+    public void SBXandAddPop(Individual parrentA, Individual parrentB){
+        Individual o1 = new Individual();
+        Individual o2 = new Individual();
+
+        int point1,point2;
+        point1 = Params.rand.nextInt(Params.maxTotalVertices);
+        do{
+            point2 = Params.rand.nextInt(Params.maxTotalVertices);
+        }while (point2 == point1);
+
+        for(int i=0;i<point1;i++){
+            o1.Chromosome[i] = parrentA.Chromosome[i];
+            o2.Chromosome[i] = parrentB.Chromosome[i];
+        }
+        for(int i=point1;i<point2;i++){
+            o1.Chromosome[i] = parrentB.Chromosome[i];
+            o2.Chromosome[i] = parrentA.Chromosome[i];
+        }
+        for(int i=point2;i<Params.maxTotalVertices;i++){
+            o1.Chromosome[i] = parrentA.Chromosome[i];
+            o2.Chromosome[i] = parrentB.Chromosome[i];
+        }
+
+        o1.skillfactor = Params.rand.nextBoolean() ? parrentA.skillfactor : parrentB.skillfactor;
+        o2.skillfactor = Params.rand.nextBoolean() ? parrentA.skillfactor : parrentB.skillfactor;
+
+        o1.calCost(prob,o1.skillfactor);
+        o2.calCost(prob,o2.skillfactor);
+
+        pop.pop.add(o1);
+        pop.pop.add(o2);
+    }
+    public static int[] Shaking(int[] Chromosome){
         int[] x = Chromosome.clone();
-        for (int i=0;i<k;i++){
+        if(Chromosome.length < 8){
             int p1,p2;
-            p1 = Params.rand.nextInt(Chromosome.length);
+            p1 = Params.rand.nextInt(Params.maxTotalVertices);
             do{
-                p2 = Params.rand.nextInt(Chromosome.length);
+                p2 = Params.rand.nextInt(Params.maxTotalVertices);
             }while (p2==p1);
 
             int temp = x[p1];
             x[p1] = x[p2];
             x[p2] = temp;
+        } else {
+            //Using double bridge
+            int[] allowSelect = new int[x.length];
+            for (int i=0;i<x.length;i++){
+                allowSelect[i] = i;
+            }
+            int[] point = new int[4];
+            for (int i=0;i<point.length;i++){
+                int select;
+                do{
+                    select = Params.rand.nextInt(allowSelect.length);
+                }while (allowSelect[select] == -1);
+
+                point[i] = allowSelect[select];
+                allowSelect[select] = -1;
+                //select + 1
+                if(select == x.length-1)
+                    allowSelect[0] = -1;
+                else
+                    allowSelect[select+1] = -1;
+
+                //select - 1
+                if(select == 0)
+                    allowSelect[x.length - 1] =-1;
+                else
+                    allowSelect[select - 1] = -1;
+            }
+            Arrays.sort(point);
+
+            int[] tempX = new int[x.length];
+            int count = 0;
+            tempX[count++] = x[point[0]];
+            for (int i = point[2]+1;i<=point[3];i++){
+                tempX[count++] = x[i];
+                x[i] = -1;
+            }
+            for (int i = point[1]+1;i<=point[2];i++){
+                tempX[count++] = x[i];
+                x[i] = -1;
+            }
+            for (int i = point[0]+1;i<=point[1];i++){
+                tempX[count++] = x[i];
+                x[i] = -1;
+            }
+            for(int i=point[3]+1;i<x.length;i++){
+                tempX[count++] = x[i];
+            }
+            for(int i=0;i<point[0];i++){
+                tempX[count++] = x[i];
+            }
+
+            x = tempX;
         }
         return x;
     }
-    public boolean localSearch(Individual indiv, int k){
-        int[] path = Shaking(indiv.Chromosome,k);
-        int i = Params.rand.nextInt(path.length-2);
-        int j = Math.min(i+5,path.length-1);
-        path = do_2_Opt(path, i, j);
+    public void localSearch(Individual indiv){
+        int[] path = indiv.Chromosome.clone();
+        path = Shaking(path);
+        path = decodeChromosome(path,indiv.skillfactor);
 
-        //*****indiv.skillfactor*******
-        do{
-            int[] decodePath = decodeChromosome(path,prob.graphs.get(indiv.skillfactor).totalVertices);
-            double pathLength = 0;
-            for(int x=0;x<decodePath.length-1;x++){
-                pathLength += prob.graphs.get(indiv.skillfactor).distance[decodePath[x]][decodePath[x+1]];
-            }
-            pathLength += prob.graphs.get(indiv.skillfactor).distance[decodePath[decodePath.length-1]][decodePath[0]];
-            Params.countEvals++;
+        double curLength = 0;
+        for(int i=0;i<path.length-1;i++){
+            curLength += prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+1]];
+        }
+        curLength += prob.graphs.get(indiv.skillfactor).distance[path[path.length-1]][path[0]];
 
-            double lengthDelta = pathLength - indiv.cost[indiv.skillfactor];
-            if (lengthDelta < 0) {
-                Individual o = new Individual(codeChromosome(decodePath,indiv.Chromosome),pathLength,indiv.skillfactor);
-                this.pop.pop.add(o);
-                return true;
-            }
-        }while (false);
-        //*****************************
+        for(int i=0; i < path.length - 1; i++) {
+            for(int j=i+1; j < path.length; j++) {
+                double lengthDelta = - prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+1]] - prob.graphs.get(indiv.skillfactor).distance[path[j]][path[j+1]]
+                        + prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[j+1]] + prob.graphs.get(indiv.skillfactor).distance[path[i]][path[j]];
+                Params.countEvals++;
 
-        for (int idGraph = 0;idGraph < prob.testCase.get(testCase).length;idGraph++){
-            if(idGraph == indiv.skillfactor) continue;
-            int[] decodePath = decodeChromosome(path,prob.graphs.get(idGraph).totalVertices);
-            double pathLength = 0;
-            for(int x=0;x<decodePath.length-1;x++){
-                pathLength += prob.graphs.get(idGraph).distance[decodePath[x]][decodePath[x+1]];
-            }
-            pathLength += prob.graphs.get(idGraph).distance[decodePath[decodePath.length-1]][decodePath[0]];
-            Params.countEvals++;
-
-            double lengthDelta = pathLength - indiv.cost[idGraph];
-            if (lengthDelta < 0) {
-                Individual o = new Individual(codeChromosome(decodePath,indiv.Chromosome),pathLength,idGraph);
-                this.pop.pop.add(o);
-                return true;
+                if (lengthDelta < 0) {
+                    path = do_2_Opt(path, i, j);
+                    curLength += lengthDelta;
+                }
             }
         }
-        return false;
+        if(curLength < indiv.cost[indiv.skillfactor]){
+//            Individual newIndiv = new Individual(codeChromosome(path,indiv.Chromosome),curLength,indiv.skillfactor);
+//            this.pop.pop.add(newIndiv);
+            Arrays.fill(indiv.cost,Double.MAX_VALUE);
+            indiv.cost[indiv.skillfactor] = curLength;
+            indiv.Chromosome = codeChromosome(path,indiv.Chromosome);
+        }
     }
     public int[] do_2_Opt(int[] path, int i, int j){
         int[] x = new int[path.length];

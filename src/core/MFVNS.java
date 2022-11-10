@@ -38,15 +38,15 @@ public class MFVNS {
             }
 
             //TODO: thưc hiện lai ghép để transfer
-            for(int i=0;i<pop.pop.size();i++){
-                Individual indiv;
+            for(int i=0;i<Params.POP_SIZE;i++){
+                int j;
                 do{
-                    indiv = pop.pop.get(Params.rand.nextInt(pop.pop.size()));
-                }while (indiv.id == pop.pop.get(i).id);
+                    j = Params.rand.nextInt(pop.pop.size());
+                }while (j==i);
 
-                SBXandAddPop(pop.pop.get(i),indiv);
+                SBXandAddPop(pop.pop.get(i),pop.pop.get(j));
             }
-            pop.reSizePop();
+            pop.reSizePop(best);
 
             System.out.print(count+": ");
             for (int i=0;i<prob.testCase.get(testCase).length;i++) {
@@ -60,23 +60,49 @@ public class MFVNS {
         Individual o1 = new Individual();
         Individual o2 = new Individual();
 
+        int[] ChromosomeA = parrentA.Chromosome.clone();
+        int[] ChromosomeB = parrentB.Chromosome.clone();
+
         int point1,point2;
         point1 = Params.rand.nextInt(Params.maxTotalVertices);
         do{
             point2 = Params.rand.nextInt(Params.maxTotalVertices);
         }while (point2 == point1);
 
-        for(int i=0;i<point1;i++){
-            o1.Chromosome[i] = parrentA.Chromosome[i];
-            o2.Chromosome[i] = parrentB.Chromosome[i];
+        if(point1 > point2){
+            int temp = point1;
+            point1 = point2;
+            point2 = temp;
         }
-        for(int i=point1;i<point2;i++){
-            o1.Chromosome[i] = parrentB.Chromosome[i];
-            o2.Chromosome[i] = parrentA.Chromosome[i];
+
+        for(int i=point1;i<=point2;i++){
+            o1.Chromosome[i]=parrentA.Chromosome[i];
+            for (int j=0;j<Params.maxTotalVertices;j++){
+                if(ChromosomeB[j]==parrentA.Chromosome[i]){
+                    ChromosomeB[j] = -1;
+                    break;
+                }
+            }
+            o2.Chromosome[i]=parrentB.Chromosome[i];
+            for (int j=0;j<Params.maxTotalVertices;j++){
+                if(ChromosomeA[j]==parrentB.Chromosome[i]){
+                    ChromosomeA[j] = -1;
+                    break;
+                }
+            }
         }
-        for(int i=point2;i<Params.maxTotalVertices;i++){
-            o1.Chromosome[i] = parrentA.Chromosome[i];
-            o2.Chromosome[i] = parrentB.Chromosome[i];
+        int count1=0,count2=0;
+        for (int i=0;i<Params.maxTotalVertices;i++){
+            if(count1 == point1)
+                count1 = point2+1;
+            if(count2 == point1)
+                count2 = point2+1;
+            if(ChromosomeA[i] != -1){
+                o2.Chromosome[count1++] = ChromosomeA[i];
+            }
+            if(ChromosomeB[i] != -1){
+                o1.Chromosome[count2++] = ChromosomeB[i];
+            }
         }
 
         o1.skillfactor = Params.rand.nextBoolean() ? parrentA.skillfactor : parrentB.skillfactor;
@@ -158,7 +184,7 @@ public class MFVNS {
     public void localSearch(Individual indiv){
         int[] path = indiv.Chromosome.clone();
         path = Shaking(path);
-        path = decodeChromosome(path,indiv.skillfactor);
+        path = decodeChromosome(path,prob.graphs.get(indiv.skillfactor).totalVertices);
 
         double curLength = 0;
         for(int i=0;i<path.length-1;i++){
@@ -168,8 +194,14 @@ public class MFVNS {
 
         for(int i=0; i < path.length - 1; i++) {
             for(int j=i+1; j < path.length; j++) {
-                double lengthDelta = - prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+1]] - prob.graphs.get(indiv.skillfactor).distance[path[j]][path[j+1]]
-                        + prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[j+1]] + prob.graphs.get(indiv.skillfactor).distance[path[i]][path[j]];
+                double lengthDelta;
+                if(j != path.length-1){
+                    lengthDelta = - prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+1]] - prob.graphs.get(indiv.skillfactor).distance[path[j]][path[j+1]]
+                            + prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[j+1]] + prob.graphs.get(indiv.skillfactor).distance[path[i]][path[j]];
+                }else {
+                    lengthDelta = - prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+1]] - prob.graphs.get(indiv.skillfactor).distance[path[j]][path[0]]
+                            + prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[0]] + prob.graphs.get(indiv.skillfactor).distance[path[i]][path[j]];
+                }
                 Params.countEvals++;
 
                 if (lengthDelta < 0) {
@@ -186,7 +218,7 @@ public class MFVNS {
             indiv.Chromosome = codeChromosome(path,indiv.Chromosome);
         }
     }
-    public int[] do_2_Opt(int[] path, int i, int j){
+    public static int[] do_2_Opt(int[] path, int i, int j){
         int[] x = new int[path.length];
         int countId = 0;
         for (int id=0;id<=i;id++){

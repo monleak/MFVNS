@@ -45,31 +45,11 @@ public class TSP_Population {
         }
         sortPopByRank();
     }
-    public void reSizePop(){
-        int maxPopSize = pop.size();
-        int maxSizePerTask = maxPopSize / prob.testCase.get(testCase).length;
-        ArrayList<Individual> tempPop = new ArrayList<>();
-        for (int elementTestCase = 0;elementTestCase < prob.testCase.get(testCase).length;elementTestCase++){
-            int count = 0;
-            sortPop(prob.testCase.get(testCase)[elementTestCase]);
-            while (count<maxSizePerTask){
-                for (int i = 0;i<pop.size();i++){
-                    if(pop.get(i).skillfactor==prob.testCase.get(testCase)[elementTestCase]){
-                        tempPop.add(pop.get(i));
-                        pop.remove(i);
-                        count++;
-                        break;
-                    }
-                }
-            }
+    public void reSizePop(double[] best){
+        setting(best);
+        while (pop.size() > Params.POP_SIZE){
+            pop.remove(pop.size()-1);
         }
-
-        sortPop(prob.testCase.get(testCase)[Params.rand.nextInt(prob.testCase.get(testCase).length)]);
-        while(tempPop.size() < maxPopSize){
-            tempPop.add(pop.get(0));
-        }
-
-        this.pop = tempPop;
     }
     public void sortPop(int idGraph) {
         //Sắp xếp lại các cá thể trong quần thể

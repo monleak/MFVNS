@@ -27,7 +27,7 @@ public class util {
     }
 
     public static int[] codeChromosome(int[] decodeChromosome, int[] previousChromosome){
-        int[] newChromosome = new int[Params.maxTotalVertices];
+        int[] newChromosome = new int[previousChromosome.length];
         int countDecode = 0;
         for(int i=0;i<newChromosome.length;i++){
             if(previousChromosome[i] >= decodeChromosome.length){

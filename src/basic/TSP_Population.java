@@ -11,10 +11,15 @@ public class TSP_Population {
     public int testCase;
     public ArrayList<Individual> pop;
 
+    public double[] best;
+
     public TSP_Population(Problem prob, int testCase){
         this.prob = prob;
         pop = new ArrayList<>();
         this.testCase = testCase;
+
+        this.best = new double[prob.graphs.size()];
+        Arrays.fill(best,Double.MAX_VALUE);
     }
 
     public void init(){
@@ -23,16 +28,19 @@ public class TSP_Population {
             individual.init();
             pop.add(individual);
         }
-    }
-
-    public void setting(double[] best){
-        //Set skillfactor
         for (int elementTestCase = 0;elementTestCase < prob.testCase.get(testCase).length;elementTestCase++){
-            //Tính cost và xếp rank các cá thể theo từng graph
+            //Tính cost
             for(int idIndiv = 0;idIndiv < pop.size();idIndiv++){
                 pop.get(idIndiv).calCost(prob,prob.testCase.get(testCase)[elementTestCase]);
             }
+        }
+    }
+    public void update(){
+        //Set skillfactor, rank and sort pop
+        for (int elementTestCase = 0;elementTestCase < prob.testCase.get(testCase).length;elementTestCase++){
+            //xếp rank các cá thể theo từng graph
             sortPop(prob.testCase.get(testCase)[elementTestCase]);
+
             for(int idIndiv = 0;idIndiv < pop.size();idIndiv++){
                 if(pop.get(idIndiv).rank == -1 || pop.get(idIndiv).rank > idIndiv){
                     pop.get(idIndiv).rank = idIndiv;
@@ -44,9 +52,7 @@ public class TSP_Population {
             }
         }
         sortPopByRank();
-    }
-    public void reSizePop(double[] best){
-        setting(best);
+
         while (pop.size() > Params.POP_SIZE){
             pop.remove(pop.size()-1);
         }

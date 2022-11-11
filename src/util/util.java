@@ -1,6 +1,7 @@
 package util;
 
 import basic.Params;
+import benchmark.Problem;
 
 public class util {
     public static void shuffleArray(int[] ar)
@@ -37,5 +38,14 @@ public class util {
             }
         }
         return newChromosome;
+    }
+    public static int giveId(int x, int y, Problem prob){
+        int p1,p2;
+        p1 = Math.min(x,y);
+        p2 = Math.max(x,y);
+        if(p1==0){
+            return p1+p2;
+        }
+        return giveId(p1-1,prob.graphs.size(),prob)+p2-p1+1;
     }
 }

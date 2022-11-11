@@ -12,8 +12,7 @@ import java.util.Random;
 
 import static IO.DataIO.readDataTSP;
 import static core.MFVNS.do_2_Opt;
-import static util.util.codeChromosome;
-import static util.util.decodeChromosome;
+import static util.util.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -31,11 +30,5 @@ public class Main {
                 solver.run();
             }
         }
-
-//        //test code
-//        int[] x = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
-//        int[] y = decodeChromosome(x,10);
-//        y = do_2_Opt(y,3,9);
-//        int[] z = codeChromosome(y,x);
     }
 }

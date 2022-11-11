@@ -15,5 +15,6 @@ public class Params {
     public static final int MAX_EVALS_PER_TESTCASE = 500000;
     public static int maxGeneration = 1000;
 
+    public static final double C = 0.02;
 
 }

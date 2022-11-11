@@ -44,9 +44,9 @@ public class MFVNS {
 
         update();
     }
-    public void run(){
+    public void run(ArrayList<String> result){
         int count = 0;
-        while (count < Params.maxGeneration/*Params.countEvals < Params.maxEvals*/){
+        while (/*count < Params.maxGeneration*/ Params.countEvals < Params.maxEvals){
             for(int i=0;i<pop.pop.size();i++){
                 localSearch(pop.pop.get(i));
             }
@@ -87,18 +87,24 @@ public class MFVNS {
             }
             update();
 
+            String temp = new String();
+            System.out.print(count+" "+Params.countEvals+": ");
+            temp += count+" "+Params.countEvals+": ";
+            for (int i=0;i<prob.testCase.get(testCase).length;i++) {
+                System.out.print(best[prob.testCase.get(testCase)[i]]+" ");
+                temp +=best[prob.testCase.get(testCase)[i]]+" ";
+            }
+            System.out.print("\n");
+            temp+="\n";
+            result.add(temp);
+
 //            System.out.print(count+": ");
-//            for (int i=0;i<prob.testCase.get(testCase).length;i++) {
-//                System.out.print(best[prob.testCase.get(testCase)[i]]+" ");
+//            for (double a :
+//                    rmp) {
+//                System.out.print(a + " ");
 //            }
 //            System.out.print("\n");
 
-            System.out.print(count+": ");
-            for (double a :
-                    rmp) {
-                System.out.print(a + " ");
-            }
-            System.out.print("\n");
             count++;
         }
     }
@@ -285,7 +291,7 @@ public class MFVNS {
                     lengthDelta = - prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+1]] - prob.graphs.get(indiv.skillfactor).distance[path[j]][path[0]]
                             + prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[0]] + prob.graphs.get(indiv.skillfactor).distance[path[i]][path[j]];
                 }
-                Params.countEvals++;
+//                Params.countEvals++;
 
                 if (lengthDelta < 0) {
                     path = do_2_Opt(path, i, j);

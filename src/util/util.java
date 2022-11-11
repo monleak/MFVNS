@@ -46,6 +46,6 @@ public class util {
         if(p1==0){
             return p1+p2;
         }
-        return giveId(p1-1,prob.graphs.size(),prob)+p2-p1+1;
+        return giveId(p1-1,prob.graphs.size()-1,prob)+p2-p1+1;
     }
 }

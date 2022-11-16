@@ -9,7 +9,7 @@ public class Params {
     public static int POP_SIZE= 200;
     public static int kmax = 4;
     public static Random rand; //Được khởi tạo theo các seed
-    public static int countEvals; //Đếm số lần đánh giá
+    public static double countEvals; //Đếm số lần đánh giá
     public static int recordsNum; //Số lần ghi lại kết quả
     public static final int REPT = 30; //Số lần chạy
     public static int maxEvals;

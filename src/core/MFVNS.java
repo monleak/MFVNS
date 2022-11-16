@@ -13,7 +13,6 @@ import java.util.Arrays;
 import static util.util.*;
 
 public class MFVNS {
-    //TODO: Xử lý tác vụ
     public TSP_Population pop;
     public double[] best;
     public Problem prob;
@@ -43,6 +42,7 @@ public class MFVNS {
         }
 
         update();
+
     }
     public void run(ArrayList<String> result){
         int count = 0;
@@ -280,6 +280,11 @@ public class MFVNS {
             curLength += prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+1]];
         }
         curLength += prob.graphs.get(indiv.skillfactor).distance[path[path.length-1]][path[0]];
+//        Params.countEvals++;
+
+
+
+        //------------------2-opt---------------
 
         for(int i=0; i < path.length - 1; i++) {
             for(int j=i+1; j < path.length; j++) {
@@ -291,7 +296,7 @@ public class MFVNS {
                     lengthDelta = - prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+1]] - prob.graphs.get(indiv.skillfactor).distance[path[j]][path[0]]
                             + prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[0]] + prob.graphs.get(indiv.skillfactor).distance[path[i]][path[j]];
                 }
-//                Params.countEvals++;
+//                Params.countEvals ++;
 
                 if (lengthDelta < 0) {
                     path = do_2_Opt(path, i, j);
@@ -299,6 +304,34 @@ public class MFVNS {
                 }
             }
         }
+
+        //------------------------------------------
+
+
+        //------------------use swap-------------
+//        double minLength = curLength;
+//        int min_i = -1;
+//        for(int i=0;i< path.length;i++){
+//            int[] tempPath = swapPath(path,i);
+//
+//            double tempLength = 0;
+//            for(int j=0;j<tempPath.length-1;j++){
+//                tempLength += prob.graphs.get(indiv.skillfactor).distance[tempPath[j]][tempPath[j+1]];
+//            }
+//            tempLength += prob.graphs.get(indiv.skillfactor).distance[tempPath[tempPath.length-1]][tempPath[0]];
+//
+////            Params.countEvals++;
+//            if(tempLength < minLength) {
+//                minLength = tempLength;
+//                min_i = i;
+//            }
+//        }
+//        if(minLength < curLength){
+//            curLength = minLength;
+//            path = swapPath(path,min_i);
+//        }
+        //---------------------------------------
+
         if(curLength < indiv.cost[indiv.skillfactor]){
 //            Individual newIndiv = new Individual(codeChromosome(path,indiv.Chromosome),curLength,indiv.skillfactor);
 //            this.pop.pop.add(newIndiv);
@@ -320,5 +353,20 @@ public class MFVNS {
             x[countId++] = path[id];
         }
         return x;
+    }
+
+    public static int[] swapPath(int[] path, int i){
+        int[] tempPath = path.clone();
+        int temp;
+        if(i == tempPath.length-1){
+            temp = tempPath[i];
+            tempPath[i] = tempPath[0];
+            tempPath[0] = temp;
+        }else {
+            temp = tempPath[i];
+            tempPath[i] = tempPath[i+1];
+            tempPath[i+1] = temp;
+        }
+        return tempPath;
     }
 }

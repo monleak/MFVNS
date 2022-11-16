@@ -41,7 +41,6 @@ public class Main {
                 Params.rand = new Random(seed);
                 Params.countEvals = 0;
                 Params.maxEvals = /*prob.testCase.get(testCase).length * */ Params.MAX_EVALS_PER_TESTCASE;
-                //TODO: Kiểm tra các phần tính countEval
                 MFVNS solver = new MFVNS(prob,testCase);
                 solver.run(result);
 

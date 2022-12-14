@@ -46,18 +46,44 @@ public class MFVNS {
     }
     public void run(ArrayList<String> result){
         int count = 0;
-        while (/*count < Params.maxGeneration*/ Params.countEvals < Params.maxEvals){
-            for(int i=0;i<pop.pop.size();i++){
-                localSearch(pop.pop.get(i));
+        boolean stop = false;
+        while (count < Params.maxGeneration /*Params.countEvals < Params.maxEvals*/ && !stop){
+            stop = true;
+            //----------local search----------
+            ArrayList<Integer> typeLocalSearch = new ArrayList<>();
+            for(int i=1;i<=2;i++){  //Hiện tại đang có 2 toán tử local search
+                typeLocalSearch.add(i);
             }
+            for(int i=0;i<pop.pop.size();i++){
+                if(best[pop.pop.get(i).skillfactor] <= prob.graphs.get(pop.pop.get(i).skillfactor).optimal){
+                    continue;
+                }
+                stop = false;
 
+                int choose; //Lựa chọn loại localSearch
+                boolean positive = false; //Local seach có hiệu quả hay không ?
+
+                ArrayList<Integer> cloneTypeLS = new ArrayList<>();
+                cloneTypeLS.addAll(typeLocalSearch);
+
+                while (cloneTypeLS.size() > 0 && !positive){
+                    choose = Params.rand.nextInt(cloneTypeLS.size());
+                    positive = localSearch(pop.pop.get(i),cloneTypeLS.get(choose));
+                    cloneTypeLS.remove(choose);
+                }
+//                localSearch(pop.pop.get(i),2);
+            }
+            //--------------------------------
+
+            //----------MFEA---------------
             for(int i=0;i<Params.POP_SIZE;i++){
                 int j;
                 do{
                     j = Params.rand.nextInt(pop.pop.size());
                 }while (j==i);
 
-                if(pop.pop.get(i).skillfactor == pop.pop.get(j).skillfactor){
+                if(pop.pop.get(i).skillfactor == pop.pop.get(j).skillfactor
+                && best[pop.pop.get(i).skillfactor] > prob.graphs.get(pop.pop.get(i).skillfactor).optimal){
                     ArrayList<Individual> child = SBX(pop.pop.get(i),pop.pop.get(j));
                     pop.pop.addAll(child);
                 }else {
@@ -85,14 +111,20 @@ public class MFVNS {
                 }
 
             }
+            //------------------------------------
+
             update();
 
             String temp = new String();
             System.out.print(count+" "+Params.countEvals+": ");
             temp += count+" "+Params.countEvals+": ";
             for (int i=0;i<prob.testCase.get(testCase).length;i++) {
-                System.out.print(best[prob.testCase.get(testCase)[i]]+" ");
-                temp +=best[prob.testCase.get(testCase)[i]]+" ";
+                if(best[prob.testCase.get(testCase)[i]] <= prob.graphs.get(prob.testCase.get(testCase)[i]).optimal){
+                    System.out.print("*"+best[prob.testCase.get(testCase)[i]]+" ");
+                }else {
+                    System.out.print(best[prob.testCase.get(testCase)[i]]+" ");
+                }
+                temp += best[prob.testCase.get(testCase)[i]]+" ";
             }
             System.out.print("\n");
             temp+="\n";
@@ -108,6 +140,11 @@ public class MFVNS {
             count++;
         }
     }
+    /**
+     * Update quần thể khi qua thế hệ mới
+     *
+     * @return void
+     */
     public void update(){
         pop.update();
         this.best = pop.best.clone();
@@ -143,6 +180,14 @@ public class MFVNS {
             diff_f_inter_x[i].clear();
         }
     }
+
+    /**
+     * Lai ghép 2 cá thể ban đầu để tạo ra 2 con mới
+     *
+     * @param  parrentA
+     * @param  parrentB
+     * @return 2 con mới
+     */
     public ArrayList<Individual> SBX(Individual parrentA, Individual parrentB){
         Individual o1 = new Individual();o1.init();
         Individual o2 = new Individual();o2.init();
@@ -203,6 +248,13 @@ public class MFVNS {
 
         return child;
     }
+
+    /**
+     * Sử dụng double bridge để biến đổi gen ban đầu
+     *
+     * @param  Chromosome Gen ban đầu
+     * @return Gen sau khi biến đổi
+     */
     public static int[] Shaking(int[] Chromosome){
         int[] x = Chromosome.clone();
         if(Chromosome.length < 8){
@@ -270,11 +322,19 @@ public class MFVNS {
         }
         return x;
     }
-    public void localSearch(Individual indiv){
+
+    /**
+     * Di chuyển cá thể hiện tại tới lời giải tốt nhất trong tập các lời giải lân cận
+     *
+     * @param  indiv Cá thể ban đầu
+     * @param  type Loại localSearch lựa chọn (1 - swap, 2 - 2opt)
+     * @return boolean Có cải thiện sau khi search hay không (T/F)
+     */
+    public boolean localSearch(Individual indiv, int type){
+        boolean positive = false;
         int[] path = indiv.Chromosome.clone();
         path = Shaking(path);
         path = decodeChromosome(path,prob.graphs.get(indiv.skillfactor).totalVertices);
-
         double curLength = 0;
         for(int i=0;i<path.length-1;i++){
             curLength += prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+1]];
@@ -282,55 +342,59 @@ public class MFVNS {
         curLength += prob.graphs.get(indiv.skillfactor).distance[path[path.length-1]][path[0]];
 //        Params.countEvals++;
 
-
-
-        //------------------2-opt---------------
-
-        for(int i=0; i < path.length - 1; i++) {
-            for(int j=i+1; j < path.length; j++) {
-                double lengthDelta;
-                if(j != path.length-1){
-                    lengthDelta = - prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+1]] - prob.graphs.get(indiv.skillfactor).distance[path[j]][path[j+1]]
-                            + prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[j+1]] + prob.graphs.get(indiv.skillfactor).distance[path[i]][path[j]];
-                }else {
-                    lengthDelta = - prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+1]] - prob.graphs.get(indiv.skillfactor).distance[path[j]][path[0]]
-                            + prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[0]] + prob.graphs.get(indiv.skillfactor).distance[path[i]][path[j]];
+        //--------------swap-------------
+        if(type == 1){
+            double minDelta = 0;
+            int min_i = -1;
+            for(int i=0;i< path.length;i++){
+                double deltaLength=0;
+                if(i==0){
+                    deltaLength = - prob.graphs.get(indiv.skillfactor).distance[path[i]][path[path.length-1]] - prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[i+2]]
+                            + prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[path.length-1]] + prob.graphs.get(indiv.skillfactor).distance[i][i+2];
+                }else if(i == path.length-1){
+                    deltaLength = - prob.graphs.get(indiv.skillfactor).distance[path[i-1]][path[i]] - prob.graphs.get(indiv.skillfactor).distance[path[0]][path[1]]
+                            + prob.graphs.get(indiv.skillfactor).distance[path[0]][path[i-1]] + prob.graphs.get(indiv.skillfactor).distance[path[i]][path[1]];
+                }else if(i == path.length-2){
+                    deltaLength = - prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i-1]] - prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[0]]
+                            + prob.graphs.get(indiv.skillfactor).distance[path[i-1]][path[i+1]] + prob.graphs.get(indiv.skillfactor).distance[path[i]][path[0]];
                 }
+                else {
+                    deltaLength = -prob.graphs.get(indiv.skillfactor).distance[path[i-1]][path[i]] - prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[i+2]]
+                            +prob.graphs.get(indiv.skillfactor).distance[path[i-1]][path[i+1]] + prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+2]];
+                }
+                if(deltaLength < minDelta){
+                    minDelta = deltaLength;
+                    min_i = i;
+                }
+            }
+            if(minDelta < 0){
+                curLength = curLength + minDelta;
+                path = swapPath(path,min_i);
+            }
+        } else
+        //-------------swap--------------
+        //------------------2-opt---------------
+        if(type == 2){
+            for(int i=0; i < path.length - 1; i++) {
+                for(int j=i+1; j < path.length; j++) {
+                    double lengthDelta;
+                    if(j != path.length-1){
+                        lengthDelta = - prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+1]] - prob.graphs.get(indiv.skillfactor).distance[path[j]][path[j+1]]
+                                + prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[j+1]] + prob.graphs.get(indiv.skillfactor).distance[path[i]][path[j]];
+                    }else {
+                        lengthDelta = - prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+1]] - prob.graphs.get(indiv.skillfactor).distance[path[j]][path[0]]
+                                + prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[0]] + prob.graphs.get(indiv.skillfactor).distance[path[i]][path[j]];
+                    }
 //                Params.countEvals ++;
 
-                if (lengthDelta < 0) {
-                    path = do_2_Opt(path, i, j);
-                    curLength += lengthDelta;
+                    if (lengthDelta < 0) {
+                        path = do_2_Opt(path, i, j);
+                        curLength += lengthDelta;
+                    }
                 }
             }
         }
-
         //------------------------------------------
-
-
-        //------------------use swap-------------
-//        double minLength = curLength;
-//        int min_i = -1;
-//        for(int i=0;i< path.length;i++){
-//            int[] tempPath = swapPath(path,i);
-//
-//            double tempLength = 0;
-//            for(int j=0;j<tempPath.length-1;j++){
-//                tempLength += prob.graphs.get(indiv.skillfactor).distance[tempPath[j]][tempPath[j+1]];
-//            }
-//            tempLength += prob.graphs.get(indiv.skillfactor).distance[tempPath[tempPath.length-1]][tempPath[0]];
-//
-////            Params.countEvals++;
-//            if(tempLength < minLength) {
-//                minLength = tempLength;
-//                min_i = i;
-//            }
-//        }
-//        if(minLength < curLength){
-//            curLength = minLength;
-//            path = swapPath(path,min_i);
-//        }
-        //---------------------------------------
 
         if(curLength < indiv.cost[indiv.skillfactor]){
 //            Individual newIndiv = new Individual(codeChromosome(path,indiv.Chromosome),curLength,indiv.skillfactor);
@@ -338,8 +402,17 @@ public class MFVNS {
             Arrays.fill(indiv.cost,Double.MAX_VALUE);
             indiv.cost[indiv.skillfactor] = curLength;
             indiv.Chromosome = codeChromosome(path,indiv.Chromosome);
+            positive = true;
         }
+        return positive;
     }
+    /**
+     * Biến đổi gen sử dụng 2-opt
+     *
+     * @param  path Gen ban đầu
+     * @param i,j 2 điểm để tráo đổi gen
+     * @return Gen sau khi biến đổi
+     */
     public static int[] do_2_Opt(int[] path, int i, int j){
         int[] x = new int[path.length];
         int countId = 0;
@@ -355,6 +428,13 @@ public class MFVNS {
         return x;
     }
 
+    /**
+     * Biến đổi gen sử dụng swap
+     *
+     * @param  path Gen ban đầu
+     * @param i điểm để tráo đổi gen
+     * @return Gen sau khi biến đổi
+     */
     public static int[] swapPath(int[] path, int i){
         int[] tempPath = path.clone();
         int temp;

@@ -16,7 +16,7 @@ public class Individual  implements Comparable<Individual> {
     public int id;
     public int[] Chromosome;
     public double[] cost;
-    public int skillfactor;
+    public int skillfactor; // Bắt đầu đếm từ 0
     public int rank;
 
     public Individual(){

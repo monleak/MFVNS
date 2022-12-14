@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class Graph {
     public int totalVertices;
     public ArrayList<Vertex> vertexList;
+    public double optimal;
 
     public double[][] distance; //distance[i][j] = khoảng cách từ đỉnh i đến đỉnh j
 
@@ -16,5 +17,9 @@ public class Graph {
 
     public void addVertex(Vertex a){
         this.vertexList.add(a);
+    }
+
+    public void setOptimal(double optimal){
+        this.optimal = optimal;
     }
 }

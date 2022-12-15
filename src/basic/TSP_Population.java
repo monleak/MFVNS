@@ -36,6 +36,10 @@ public class TSP_Population {
         }
     }
     public void update(){
+        //reset rank
+        for(int idIndiv = 0;idIndiv < pop.size();idIndiv++){
+            pop.get(idIndiv).rank = -1;
+        }
         //Set skillfactor, rank and sort pop
         for (int elementTestCase = 0;elementTestCase < prob.testCase.get(testCase).length;elementTestCase++){
             //xếp rank các cá thể theo từng graph

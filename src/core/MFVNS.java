@@ -47,7 +47,7 @@ public class MFVNS {
     public void run(ArrayList<String> result){
         int count = 0;
         boolean stop = false;
-        while (count < Params.maxGeneration /*Params.countEvals < Params.maxEvals*/ && !stop){
+        while (count < Params.maxGeneration /*Params.countEvals < Params.maxEvals*/){
             stop = true;
             //----------local search----------
             ArrayList<Integer> typeLocalSearch = new ArrayList<>();
@@ -55,26 +55,26 @@ public class MFVNS {
                 typeLocalSearch.add(i);
             }
             for(int i=0;i<pop.pop.size();i++){
-                if(best[pop.pop.get(i).skillfactor] <= prob.graphs.get(pop.pop.get(i).skillfactor).optimal){
+                if((int)best[pop.pop.get(i).skillfactor] <= prob.graphs.get(pop.pop.get(i).skillfactor).optimal){
                     continue;
                 }
                 stop = false;
 
-                int choose; //Lựa chọn loại localSearch
-                boolean positive = false; //Local seach có hiệu quả hay không ?
-
-                ArrayList<Integer> cloneTypeLS = new ArrayList<>();
-                cloneTypeLS.addAll(typeLocalSearch);
-
-                while (cloneTypeLS.size() > 0 && !positive){
-                    choose = Params.rand.nextInt(cloneTypeLS.size());
-                    positive = localSearch(pop.pop.get(i),cloneTypeLS.get(choose));
-                    cloneTypeLS.remove(choose);
-                }
-//                localSearch(pop.pop.get(i),2);
+//                int choose; //Lựa chọn loại localSearch
+//                boolean positive = false; //Local seach có hiệu quả hay không ?
+//
+//                ArrayList<Integer> cloneTypeLS = new ArrayList<>();
+//                cloneTypeLS.addAll(typeLocalSearch);
+//
+//                while (cloneTypeLS.size() > 0 && !positive){
+//                    choose = Params.rand.nextInt(cloneTypeLS.size());
+//                    positive = localSearch(pop.pop.get(i),cloneTypeLS.get(choose));
+//                    cloneTypeLS.remove(choose);
+//                }
+                localSearch(pop.pop.get(i),2);
             }
             //--------------------------------
-
+            if(stop) break;
             //----------MFEA---------------
             for(int i=0;i<Params.POP_SIZE;i++){
                 int j;
@@ -82,8 +82,7 @@ public class MFVNS {
                     j = Params.rand.nextInt(pop.pop.size());
                 }while (j==i);
 
-                if(pop.pop.get(i).skillfactor == pop.pop.get(j).skillfactor
-                && best[pop.pop.get(i).skillfactor] > prob.graphs.get(pop.pop.get(i).skillfactor).optimal){
+                if(pop.pop.get(i).skillfactor == pop.pop.get(j).skillfactor){
                     ArrayList<Individual> child = SBX(pop.pop.get(i),pop.pop.get(j));
                     pop.pop.addAll(child);
                 }else {
@@ -119,7 +118,7 @@ public class MFVNS {
             System.out.print(count+" "+Params.countEvals+": ");
             temp += count+" "+Params.countEvals+": ";
             for (int i=0;i<prob.testCase.get(testCase).length;i++) {
-                if(best[prob.testCase.get(testCase)[i]] <= prob.graphs.get(prob.testCase.get(testCase)[i]).optimal){
+                if((int)best[prob.testCase.get(testCase)[i]] <= prob.graphs.get(prob.testCase.get(testCase)[i]).optimal){
                     System.out.print("*"+best[prob.testCase.get(testCase)[i]]+" ");
                 }else {
                     System.out.print(best[prob.testCase.get(testCase)[i]]+" ");
@@ -146,6 +145,7 @@ public class MFVNS {
      * @return void
      */
     public void update(){
+        //TODO: Check lại update rank
         pop.update();
         this.best = pop.best.clone();
 
@@ -341,7 +341,6 @@ public class MFVNS {
         }
         curLength += prob.graphs.get(indiv.skillfactor).distance[path[path.length-1]][path[0]];
 //        Params.countEvals++;
-
         //--------------swap-------------
         if(type == 1){
             double minDelta = 0;
@@ -350,7 +349,7 @@ public class MFVNS {
                 double deltaLength=0;
                 if(i==0){
                     deltaLength = - prob.graphs.get(indiv.skillfactor).distance[path[i]][path[path.length-1]] - prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[i+2]]
-                            + prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[path.length-1]] + prob.graphs.get(indiv.skillfactor).distance[i][i+2];
+                            + prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[path.length-1]] + prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+2]];
                 }else if(i == path.length-1){
                     deltaLength = - prob.graphs.get(indiv.skillfactor).distance[path[i-1]][path[i]] - prob.graphs.get(indiv.skillfactor).distance[path[0]][path[1]]
                             + prob.graphs.get(indiv.skillfactor).distance[path[0]][path[i-1]] + prob.graphs.get(indiv.skillfactor).distance[path[i]][path[1]];

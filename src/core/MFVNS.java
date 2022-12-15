@@ -60,18 +60,18 @@ public class MFVNS {
                 }
                 stop = false;
 
-//                int choose; //Lựa chọn loại localSearch
-//                boolean positive = false; //Local seach có hiệu quả hay không ?
-//
-//                ArrayList<Integer> cloneTypeLS = new ArrayList<>();
-//                cloneTypeLS.addAll(typeLocalSearch);
-//
-//                while (cloneTypeLS.size() > 0 && !positive){
-//                    choose = Params.rand.nextInt(cloneTypeLS.size());
-//                    positive = localSearch(pop.pop.get(i),cloneTypeLS.get(choose));
-//                    cloneTypeLS.remove(choose);
-//                }
-                localSearch(pop.pop.get(i),2);
+                int choose; //Lựa chọn loại localSearch
+                boolean positive = false; //Local seach có hiệu quả hay không ?
+
+                ArrayList<Integer> cloneTypeLS = new ArrayList<>();
+                cloneTypeLS.addAll(typeLocalSearch);
+
+                while (cloneTypeLS.size() > 0 && !positive){
+                    choose = Params.rand.nextInt(cloneTypeLS.size());
+                    positive = localSearch(pop.pop.get(i),cloneTypeLS.get(choose));
+                    cloneTypeLS.remove(choose);
+                }
+//                localSearch(pop.pop.get(i),2);
             }
             //--------------------------------
             if(stop) break;

@@ -1,4 +1,4 @@
-package TSP.main;
+package CTSP.main;
 
 import TSP.basic.Params;
 import TSP.benchmark.Problem;

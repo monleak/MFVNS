@@ -1,4 +1,4 @@
-package TSP.benchmark;
+package CTSP.benchmark;
 
 public class Vertex {
     public int id;

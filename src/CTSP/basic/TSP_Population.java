@@ -1,6 +1,6 @@
-package TSP.basic;
+package CTSP.basic;
 
-import TSP.benchmark.Problem;
+import CTSP.benchmark.Problem;
 
 import java.util.ArrayList;
 import java.util.Arrays;

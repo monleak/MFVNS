@@ -1,14 +1,14 @@
-package TSP.core;
+package CTSP.core;
 
-import TSP.basic.Individual;
-import TSP.basic.Params;
-import TSP.basic.TSP_Population;
-import TSP.benchmark.Problem;
+import CTSP.basic.Individual;
+import CTSP.basic.Params;
+import CTSP.basic.TSP_Population;
+import CTSP.benchmark.Problem;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static util.util.*;
+import static CTSP.util.util.*;
 
 public class MFVNS {
     public TSP_Population pop;

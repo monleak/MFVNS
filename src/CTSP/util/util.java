@@ -1,7 +1,7 @@
-package TSP.util;
+package CTSP.util;
 
-import TSP.basic.Params;
-import TSP.benchmark.Problem;
+import CTSP.basic.Params;
+import CTSP.benchmark.Problem;
 
 public class util {
     public static void shuffleArray(int[] ar)

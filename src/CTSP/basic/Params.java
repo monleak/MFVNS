@@ -1,4 +1,4 @@
-package TSP.basic;
+package CTSP.basic;
 
 import java.util.Random;
 

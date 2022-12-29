@@ -1,11 +1,11 @@
-package TSP.basic;
+package CTSP.basic;
 
-import TSP.benchmark.Problem;
-import TSP.util.util;
+import CTSP.benchmark.Problem;
+import CTSP.util.util;
 
 import java.util.Arrays;
 
-import static util.util.shuffleArray;
+import static CTSP.util.util.shuffleArray;
 
 public class Individual  implements Comparable<Individual> {
     public static int countID=0;

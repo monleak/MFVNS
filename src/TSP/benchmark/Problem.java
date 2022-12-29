@@ -4,7 +4,7 @@ import TSP.basic.Params;
 
 import java.util.ArrayList;
 
-import static IO.DataIO.readDataTSP;
+import static TSP.IO.DataIO.readDataTSP;
 
 public class Problem {
     public ArrayList<Graph> graphs;

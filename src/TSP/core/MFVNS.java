@@ -8,7 +8,7 @@ import TSP.benchmark.Problem;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static util.util.*;
+import static TSP.util.util.*;
 
 public class MFVNS {
     public TSP_Population pop;

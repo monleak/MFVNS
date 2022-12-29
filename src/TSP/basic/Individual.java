@@ -5,7 +5,7 @@ import TSP.util.util;
 
 import java.util.Arrays;
 
-import static util.util.shuffleArray;
+import static TSP.util.util.shuffleArray;
 
 public class Individual  implements Comparable<Individual> {
     public static int countID=0;

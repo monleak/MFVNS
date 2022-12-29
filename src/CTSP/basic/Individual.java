@@ -1,13 +1,9 @@
-package basic;
+package TSP.basic;
 
-import benchmark.Graph;
-import benchmark.Problem;
-import util.util;
+import TSP.benchmark.Problem;
+import TSP.util.util;
 
-import java.awt.*;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 import static util.util.shuffleArray;
 
@@ -43,7 +39,7 @@ public class Individual  implements Comparable<Individual> {
 
     public void init(){
         int i = 0;
-        while(i<Params.maxTotalVertices){
+        while(i< Params.maxTotalVertices){
             Chromosome[i] = i;
             i++;
         }

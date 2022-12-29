@@ -1,7 +1,7 @@
-package IO;
+package TSP.IO;
 
-import benchmark.Graph;
-import benchmark.Vertex;
+import TSP.benchmark.Graph;
+import TSP.benchmark.Vertex;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

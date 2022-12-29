@@ -1,12 +1,10 @@
-package core;
+package TSP.core;
 
-import basic.Individual;
-import basic.Params;
-import basic.TSP_Population;
-import benchmark.Problem;
+import TSP.basic.Individual;
+import TSP.basic.Params;
+import TSP.basic.TSP_Population;
+import TSP.benchmark.Problem;
 
-import java.awt.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -76,7 +74,7 @@ public class MFVNS {
             //--------------------------------
             if(stop) break;
             //----------MFEA---------------
-            for(int i=0;i<Params.POP_SIZE;i++){
+            for(int i = 0; i< Params.POP_SIZE; i++){
                 int j;
                 do{
                     j = Params.rand.nextInt(pop.pop.size());
@@ -115,8 +113,8 @@ public class MFVNS {
             update();
 
             String temp = new String();
-            System.out.print(count+" "+Params.countEvals+": ");
-            temp += count+" "+Params.countEvals+": ";
+            System.out.print(count+" "+ Params.countEvals+": ");
+            temp += count+" "+ Params.countEvals+": ";
             for (int i=0;i<prob.testCase.get(testCase).length;i++) {
                 if((int)best[prob.testCase.get(testCase)[i]] <= prob.graphs.get(prob.testCase.get(testCase)[i]).optimal){
                     System.out.print("*"+best[prob.testCase.get(testCase)[i]]+" ");
@@ -209,14 +207,14 @@ public class MFVNS {
 
         for(int i=point1;i<=point2;i++){
             o1.Chromosome[i]=parrentA.Chromosome[i];
-            for (int j=0;j<Params.maxTotalVertices;j++){
+            for (int j = 0; j< Params.maxTotalVertices; j++){
                 if(ChromosomeB[j]==parrentA.Chromosome[i]){
                     ChromosomeB[j] = -1;
                     break;
                 }
             }
             o2.Chromosome[i]=parrentB.Chromosome[i];
-            for (int j=0;j<Params.maxTotalVertices;j++){
+            for (int j = 0; j< Params.maxTotalVertices; j++){
                 if(ChromosomeA[j]==parrentB.Chromosome[i]){
                     ChromosomeA[j] = -1;
                     break;
@@ -224,7 +222,7 @@ public class MFVNS {
             }
         }
         int count1=0,count2=0;
-        for (int i=0;i<Params.maxTotalVertices;i++){
+        for (int i = 0; i< Params.maxTotalVertices; i++){
             if(count1 == point1)
                 count1 = point2+1;
             if(count2 == point1)

@@ -1,6 +1,6 @@
-package basic;
+package TSP.basic;
 
-import benchmark.Problem;
+import TSP.benchmark.Problem;
 
 import java.util.ArrayList;
 import java.util.Arrays;

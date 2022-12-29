@@ -1,4 +1,4 @@
-package benchmark;
+package TSP.benchmark;
 
 import java.util.ArrayList;
 

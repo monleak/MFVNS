@@ -1,6 +1,6 @@
-package benchmark;
+package TSP.benchmark;
 
-import basic.Params;
+import TSP.basic.Params;
 
 import java.util.ArrayList;
 

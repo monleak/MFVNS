@@ -1,20 +1,12 @@
-package main;
+package TSP.main;
 
-import basic.Individual;
-import basic.Params;
-import basic.TSP_Population;
-import benchmark.Graph;
-import benchmark.Problem;
-import core.MFVNS;
+import TSP.basic.Params;
+import TSP.benchmark.Problem;
+import TSP.core.MFVNS;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
-
-import static IO.DataIO.readDataTSP;
-import static core.MFVNS.do_2_Opt;
-import static util.util.*;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -34,7 +26,7 @@ public class Main {
                 dirTestCase.mkdir();
             }
 
-            for (int seed = 0;seed < Params.REPT;seed++){
+            for (int seed = 0; seed < Params.REPT; seed++){
                 ArrayList<String> result = new ArrayList<>();
 
                 System.out.println("=============== Test case " + (testCase+1) +" Seed "+ seed +" =================");
@@ -44,6 +36,7 @@ public class Main {
                 MFVNS solver = new MFVNS(prob,testCase);
                 solver.run(result);
 
+                //in ra file
                 String fitnessFile = subFolder + (seed + 1) + ".txt";
                 DataOutputStream outFit = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(fitnessFile)));
                 for(int i=0;i<result.size();i++){

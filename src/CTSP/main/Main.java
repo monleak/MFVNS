@@ -1,8 +1,8 @@
 package CTSP.main;
 
-import TSP.basic.Params;
-import TSP.benchmark.Problem;
-import TSP.core.MFVNS;
+import CTSP.basic.Params;
+import CTSP.benchmark.Problem;
+import CTSP.core.MFVNS;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -17,10 +17,13 @@ public class Main {
         if (!dir.exists()) {
             dir.mkdir();
         }
-
+        File subDir = new File(Params.linkOutput+Params.linkOutputCTSP); //Tạo thư mục con chứa kết quả CTSP nếu chưa có
+        if (!subDir.exists()) {
+            subDir.mkdir();
+        }
         for(int testCase = 0;testCase<prob.testCase.size();testCase++){
 
-            String subFolder = Params.linkOutput+"TESTCASE"+testCase+"//";
+            String subFolder = Params.linkOutput+Params.linkOutputCTSP+"TESTCASE"+testCase+"//";
             File dirTestCase = new File(subFolder);
             if (!dirTestCase.exists()) {
                 dirTestCase.mkdir();

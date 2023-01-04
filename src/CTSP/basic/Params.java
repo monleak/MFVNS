@@ -5,6 +5,7 @@ import java.util.Random;
 public class Params {
     public static String linkData = "Data//";
     public static String linkOutput = "Result//";
+    public static String linkOutputCTSP = "resultCTSP//";
     public static int maxTotalVertices = 0;
     public static int POP_SIZE= 200;
     public static int kmax = 4;

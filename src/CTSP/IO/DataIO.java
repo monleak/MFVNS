@@ -12,6 +12,8 @@ enum typeGraph {
 }
 public class DataIO {
     public static Graph readDataCTSP(String linkFile) {
+        String startMess = "Reading data from "+linkFile;
+        System.out.print(startMess);
         Graph graph = null;
         //Khởi tạo cấu trúc dữ liệu và lưu nó trong mảng 2 chiều
         BufferedReader readBuffer = null;
@@ -65,23 +67,24 @@ public class DataIO {
                     }
                 }
             } else if(type == typeGraph.NONEUCLIDEAN){
-                for(int i=0;i< graph.totalVertices;i++){
-                    Vertex vertex = new Vertex(i+1);
-                    graph.addVertex(vertex);
-                }
-                int count = 0;
-                do{
-                    line = readBuffer.readLine();
-                    if(line.contains("CLUSTER_SECTION")){//Dấu hiệu bắt đầu của phần dữ liệu cụm
-                        break;
-                    }
-                    String[] result = line.split("\t");
-
-                    for (int j=0;j<graph.totalVertices;j++){
-                        graph.distance[count][j] = Integer.parseInt(result[j].trim());
-                    }
-                    count++;
-                }while (true);
+                throw new Exception("\nHiện tại chưa hỗ trợ các bộ dữ liệu NONEUCLIDEAN");
+//                for(int i=0;i< graph.totalVertices;i++){
+//                    Vertex vertex = new Vertex(i+1);
+//                    graph.addVertex(vertex);
+//                }
+//                int count = 0;
+//                do{
+//                    line = readBuffer.readLine();
+//                    if(line.contains("CLUSTER_SECTION")){//Dấu hiệu bắt đầu của phần dữ liệu cụm
+//                        break;
+//                    }
+//                    String[] result = line.split("\t");
+//
+//                    for (int j=0;j<graph.totalVertices;j++){
+//                        graph.distance[count][j] = Integer.parseInt(result[j].trim());
+//                    }
+//                    count++;
+//                }while (true);
             }
 
             line = readBuffer.readLine();
@@ -103,8 +106,11 @@ public class DataIO {
             }while(true);
         }catch(Exception e){
             System.out.println(e);
-            System.exit(0);
+            return graph;
         }
+        String clearStartMess = "\b".repeat(startMess.length());
+        System.out.print(clearStartMess);
+        System.out.println(startMess + " ✔️DONE");
         return graph;
     }
     public static double calDis(int x1,int y1,int x2,int y2){

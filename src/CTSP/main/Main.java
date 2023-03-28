@@ -13,14 +13,25 @@ public class Main {
         Params.recordsNum = 1000;
         Problem prob = new Problem();
 
+    /*
+        Tạo các thư mục chứa kết quả
+     */
         File dir = new File(Params.linkOutput);
         if (!dir.exists()) {
-            dir.mkdir();
+            boolean checkDirIsExists = dir.mkdir();
+            if(!checkDirIsExists){
+                System.out.println("Lỗi khi tạo folder Result");
+            }
         }
         File subDir = new File(Params.linkOutput+Params.linkOutputCTSP); //Tạo thư mục con chứa kết quả CTSP nếu chưa có
         if (!subDir.exists()) {
-            subDir.mkdir();
+            boolean checkSubDirIsExists = subDir.mkdir();
+            if(!checkSubDirIsExists){
+                System.out.println("Lỗi khi tạo folder Result/CTSP");
+            }
         }
+
+
         for(int testCase = 0;testCase<prob.testCase.size();testCase++){
 
             String subFolder = Params.linkOutput+Params.linkOutputCTSP+"TESTCASE"+testCase+"//";

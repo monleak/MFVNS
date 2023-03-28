@@ -11,11 +11,13 @@ public class Graph {
 
     public int numberOfCluster; //Số cụm
     public int sourceVertex;
+    public String linkFile;
 
-    public Graph(int totalVertices){
+    public Graph(int totalVertices, String linkFile){
         this.totalVertices = totalVertices;
         this.vertexList = new ArrayList<>();
         this.distance = new double[totalVertices][totalVertices];
+        this.linkFile = linkFile;
     }
 
     public void addVertex(Vertex a){

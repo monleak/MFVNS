@@ -33,7 +33,7 @@ public class DataIO {
                 }else if(line.contains("DIMENSION")){
                     //Đọc giá trị của tổng số thành phố
                     String[] result = line.split(":");
-                    graph = new Graph(Integer.parseInt(result[1].trim()));
+                    graph = new Graph(Integer.parseInt(result[1].trim()),linkFile);
                 }else if(line.contains("NUMBER_OF_CLUSTERS")){
                     String[] result = line.split(":");
                     graph.numberOfCluster = Integer.parseInt(result[1].trim());

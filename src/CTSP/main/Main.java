@@ -10,9 +10,6 @@ import java.util.Random;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        Params.recordsNum = 1000;
-        Problem prob = new Problem();
-
     /*
         Tạo các thư mục chứa kết quả
      */
@@ -31,19 +28,35 @@ public class Main {
             }
         }
 
-
-        for(int testCase = 0;testCase<prob.testCase.size();testCase++){
-
-            String subFolder = Params.linkOutput+Params.linkOutputCTSP+"TESTCASE"+testCase+"//";
-            File dirTestCase = new File(subFolder);
-            if (!dirTestCase.exists()) {
-                dirTestCase.mkdir();
+        /*
+        LARGE INSTANCES
+         */
+        File largeInstance = new File(Params.linkOutput+Params.linkOutputCTSP+"Large//"); //Tạo thư mục con chứa kết quả Large instance nếu chưa có
+        if (!largeInstance.exists()) {
+            boolean check = largeInstance.mkdir();
+            if(!check){
+                System.out.println("Lỗi khi tạo folder Result/CTSP/Large/");
             }
+        }
+        ArrayList<Problem> largeProblem = new ArrayList<>();
+        largeProblem.add(new Problem("Data/b4gcgybvt6-4/Euclidean instances/Large Instances/Type_1_Large"));
+        largeProblem.add(new Problem("Data/b4gcgybvt6-4/Euclidean instances/Large Instances/Type_2"));
+        largeProblem.add(new Problem("Data/b4gcgybvt6-4/Euclidean instances/Large Instances/Type_3_Large"));
+        largeProblem.add(new Problem("Data/b4gcgybvt6-4/Euclidean instances/Large Instances/Type_4_Large"));
+        largeProblem.add(new Problem("Data/b4gcgybvt6-4/Euclidean instances/Large Instances/Type_5_Large"));
+        largeProblem.add(new Problem("Data/b4gcgybvt6-4/Euclidean instances/Large Instances/Type_6_Large"));
 
+        for(int problemID=0;problemID<largeProblem.size();problemID++){
+            File typeDir = new File(Params.linkOutput+Params.linkOutputCTSP+"Large//"+largeProblem.get(problemID).instanceName);
+            if (!typeDir.exists()) {
+                boolean check = typeDir.mkdir();
+                if(!check){
+                    System.out.println("Lỗi khi tạo folder Result/CTSP/Large/"+largeProblem.get(problemID).instanceName);
+                }
+            }
             for (int seed = 0; seed < Params.REPT; seed++){
                 ArrayList<String> result = new ArrayList<>();
-
-                System.out.println("=============== Test case " + (testCase+1) +" Seed "+ seed +" =================");
+                System.out.println("=============== " + largeProblem.get(problemID).instanceName +" Seed "+ seed +" =================");
                 Params.rand = new Random(seed);
                 Params.countEvals = 0;
                 Params.maxEvals = /*prob.testCase.get(testCase).length * */ Params.MAX_EVALS_PER_TESTCASE;
@@ -51,7 +64,7 @@ public class Main {
                 solver.run(result);
 
                 //in ra file
-                String fitnessFile = subFolder + (seed + 1) + ".txt";
+                String fitnessFile = typeDir.getPath() + (seed + 1) + ".txt";
                 DataOutputStream outFit = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(fitnessFile)));
                 for(int i=0;i<result.size();i++){
                     outFit.writeBytes(result.get(i));

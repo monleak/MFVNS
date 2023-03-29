@@ -108,9 +108,9 @@ public class DataIO {
             System.out.println(e);
             return graph;
         }
-        String clearStartMess = "\b".repeat(startMess.length());
-        System.out.print(clearStartMess);
-        System.out.println(startMess + " ✔️DONE");
+//        String clearStartMess = "\b".repeat(startMess.length());
+//        System.out.print(clearStartMess);
+        System.out.println(" ✔️DONE");
         return graph;
     }
     public static double calDis(int x1,int y1,int x2,int y2){

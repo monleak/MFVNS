@@ -6,14 +6,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
-public class TSP_Population {
+public class CTSP_Population {
     public Problem prob;
     public int testCase;
     public ArrayList<Individual> pop;
 
     public double[] best;
 
-    public TSP_Population(Problem prob, int testCase){
+    public CTSP_Population(Problem prob, int testCase){
         this.prob = prob;
         pop = new ArrayList<>();
         this.testCase = testCase;

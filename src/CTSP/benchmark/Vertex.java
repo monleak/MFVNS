@@ -4,7 +4,6 @@ public class Vertex {
     public int id;
     public int x;
     public int y;
-    public int idCluster;
 
     public Vertex(int id, int x, int y){
         this.id = id;
@@ -13,8 +12,5 @@ public class Vertex {
     }
     public Vertex(int id){
         this.id = id;
-    }
-    public void addCluster(int idCluster){
-        this.idCluster = idCluster;
     }
 }

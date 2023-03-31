@@ -5,6 +5,7 @@ import CTSP.util.util;
 
 import java.util.Arrays;
 
+import static CTSP.util.util.randIntArray;
 import static CTSP.util.util.shuffleArray;
 
 public class Individual  implements Comparable<Individual> {
@@ -15,16 +16,20 @@ public class Individual  implements Comparable<Individual> {
     public int skillfactor; // Bắt đầu đếm từ 0
     public int rank;
 
-    public Individual(){
+    /**
+     * Khởi tạo 1 cá thể mới trong không gian chung
+     * @param maxTotalVertices
+     * @param numberOfTask
+     */
+    public Individual(int maxTotalVertices, int numberOfTask){
         this.id = Individual.countID++;
-        Chromosome = new int[Params.maxTotalVertices];
-        Arrays.fill(Chromosome,-1);
+        Chromosome = randIntArray(maxTotalVertices);
 
-        rank = -1;
-
-        cost = new double[8];
+        cost = new double[numberOfTask];
         Arrays.fill(cost,Double.MAX_VALUE);
+
         skillfactor = -1;
+        rank = -1;
     }
     public Individual(int[] Chromosome, double cost,int skillfactor){
         this.id = Individual.countID++;
@@ -35,16 +40,6 @@ public class Individual  implements Comparable<Individual> {
         Arrays.fill(this.cost,Double.MAX_VALUE);
         this.cost[skillfactor] = cost;
         this.skillfactor = skillfactor;
-    }
-
-    public void init(){
-        int i = 0;
-        while(i< Params.maxTotalVertices){
-            Chromosome[i] = i;
-            i++;
-        }
-
-        shuffleArray(Chromosome);
     }
 
     public void calCost(Problem prob, int idGraph){

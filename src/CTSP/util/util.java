@@ -4,6 +4,19 @@ import CTSP.basic.Params;
 import CTSP.benchmark.Problem;
 
 public class util {
+    /**
+     *
+     * @param n
+     * @return Mảng số nguyên hoán vị tăng dần có độ dài n
+     */
+    public static int[] randIntArray(int n){
+        int[] intArray = new int[n];
+        for(int i=0;i<n;i++){
+            intArray[i] = i;
+        }
+        shuffleArray(intArray);
+        return intArray;
+    }
     public static void shuffleArray(int[] ar)
     {
         for (int i = ar.length - 1; i > 0; i--)

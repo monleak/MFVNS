@@ -8,20 +8,20 @@ import java.util.Comparator;
 
 public class CTSP_Population {
     public Problem prob;
-    public int testCase;
     public ArrayList<Individual> pop;
-
     public double[] best;
 
-    public CTSP_Population(Problem prob, int testCase){
+    public CTSP_Population(Problem prob){
         this.prob = prob;
         pop = new ArrayList<>();
-        this.testCase = testCase;
 
         this.best = new double[prob.graphs.size()];
         Arrays.fill(best,Double.MAX_VALUE);
     }
 
+    /**
+     * Khởi tạo quẩn thể và tính cost
+     */
     public void init(){
         while (pop.size() < Params.POP_SIZE){
             Individual individual = new Individual();

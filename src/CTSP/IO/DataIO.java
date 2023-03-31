@@ -15,12 +15,15 @@ public class DataIO {
         String startMess = "Reading data from "+linkFile;
         System.out.print(startMess);
         Graph graph = null;
+
         //Khởi tạo cấu trúc dữ liệu và lưu nó trong mảng 2 chiều
         BufferedReader readBuffer = null;
         try{
             readBuffer = new BufferedReader(new FileReader(linkFile));
             String line;
             typeGraph type = typeGraph.NOTYPE;
+            int totalVertices = 0;
+            int numberOfCluster = 0;
             do{
                 //Đọc từng dòng của file đến phần bắt đầu tọa độ
                 line = readBuffer.readLine();
@@ -33,13 +36,15 @@ public class DataIO {
                 }else if(line.contains("DIMENSION")){
                     //Đọc giá trị của tổng số thành phố
                     String[] result = line.split(":");
-                    graph = new Graph(Integer.parseInt(result[1].trim()),linkFile);
+                    totalVertices = Integer.parseInt(result[1].trim());
                 }else if(line.contains("NUMBER_OF_CLUSTERS")){
                     String[] result = line.split(":");
-                    graph.numberOfCluster = Integer.parseInt(result[1].trim());
+                    numberOfCluster = Integer.parseInt(result[1].trim());
                 }else if(line.contains("NODE_COORD_SECTION") || line.contains("EDGE_WEIGHT_SECTION"))
                     break; //Thoát khỏi vòng lặp
             }while (true);
+
+            graph = new Graph(totalVertices,numberOfCluster,linkFile);
 
             if(type == typeGraph.EUCLIDEAN){
                 do{
@@ -101,7 +106,7 @@ public class DataIO {
                 }
                 String[] result = line.split(" ");
                 for(int j=1;j<result.length-1;j++){
-                    graph.vertexList.get(Integer.parseInt(result[j].trim())).idCluster = Integer.parseInt(result[0].trim());
+                    graph.listCluster[Integer.parseInt(result[0].trim())-1].add(Integer.parseInt(result[j].trim()));
                 }
             }while(true);
         }catch(Exception e){

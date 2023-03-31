@@ -54,6 +54,7 @@ public class Main {
                     System.out.println("Lỗi khi tạo folder Result/CTSP/Large/"+largeProblem.get(problemID).instanceName);
                 }
             }
+
             for (int seed = 0; seed < Params.REPT; seed++){
                 ArrayList<String> result = new ArrayList<>();
                 System.out.println("=============== " + largeProblem.get(problemID).instanceName +" Seed "+ seed +" =================");

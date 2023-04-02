@@ -24,16 +24,10 @@ public class CTSP_Population {
      */
     public void init(){
         while (pop.size() < Params.POP_SIZE){
-            Individual individual = new Individual();
-            individual.init();
+            Individual individual = new Individual(prob.maxTotalVertices, prob.numberOfGraph,prob.maxNumberOfCluster,prob.numberOfVerticesPerCluster);
             pop.add(individual);
         }
-        for (int elementTestCase = 0;elementTestCase < prob.testCase.get(testCase).length;elementTestCase++){
-            //Tính cost
-            for(int idIndiv = 0;idIndiv < pop.size();idIndiv++){
-                pop.get(idIndiv).calCost(prob,prob.testCase.get(testCase)[elementTestCase]);
-            }
-        }
+
     }
     public void update(){
         //reset rank

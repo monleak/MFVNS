@@ -19,7 +19,7 @@ public class Problem {
     public int numberOfGraph;
 
     /**
-     * numberOfVerticesPerCluster là số lượng đỉnh lớn nhất ở mỗi cluster.
+     * numberOfVerticesPerCluster là số lượng đỉnh lớn nhất ở mỗi cluster. (Có thể được viết tắt là NOVPC)
      * Ví dụ:
      * Graph 1 có 4 cluster lần lượt là: C1 có 3 đỉnh, C2 có 5 đỉnh, C3 có 1 đỉnh, C4 có 2 đỉnh
      * Graph 2 có 3 cluster lần lượt là: C1 có 3 đỉnh, C2 có 2 đỉnh, C3 có 4 đỉnh
@@ -28,6 +28,7 @@ public class Problem {
     public int[] numberOfVerticesPerCluster;
     public int maxNumberOfCluster;
     public String instanceName; //Tên của folder chứa các file .clt
+    public int maxTotalVertices;
 
     public Problem(String pathInstance){
         //TODO: cần check
@@ -37,19 +38,22 @@ public class Problem {
         this.numberOfGraph = graphs.size();
 
         for(int i=0;i<numberOfGraph;i++){
-            graphs.get(i).sortListCluster();
             if(maxNumberOfCluster < graphs.get(i).numberOfCluster){
                 maxNumberOfCluster = graphs.get(i).numberOfCluster;
             }
         }
 
-        this.numberOfVerticesPerCluster = maxNumberOfCluster != 0 ? new int[maxNumberOfCluster] : null;
+        this.numberOfVerticesPerCluster = new int[maxNumberOfCluster];
         for(Graph g : graphs){
-            for(int i = 0;i<maxNumberOfCluster;i++){
-                if(numberOfVerticesPerCluster[i] < g.listCluster[i].size()){
-                    numberOfVerticesPerCluster[i] = g.listCluster[i].size();
+            for(int i = 0;i<g.numberOfCluster;i++){
+                if(numberOfVerticesPerCluster[i] < g.listCluster.get(i).listVertex.size()){
+                    numberOfVerticesPerCluster[i] = g.listCluster.get(i).listVertex.size();
                 }
             }
+        }
+        this.maxTotalVertices =0;
+        for(int temp : numberOfVerticesPerCluster){
+            this.maxTotalVertices+=temp;
         }
     }
 }

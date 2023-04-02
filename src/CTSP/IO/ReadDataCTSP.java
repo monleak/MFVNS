@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import static CTSP.IO.DataIO.readDataCTSP;
 
 public class ReadDataCTSP {
-    //TODO: Viết các hàm quét tất cả file data CTSP. Các file này sẽ được gọi trong benchmark.Problem để tự động khởi tạo list các graph
-
     public static ArrayList<Graph> scanCTSPfile(String path){
         ArrayList<Graph> graphs = new ArrayList<>();
         File file = new File(path);
@@ -40,7 +38,7 @@ public class ReadDataCTSP {
         return graphs;
     }
 
-    // file filter for sort mp3 files
+    // file filter for sort .clt files
     static FileFilter filter = new FileFilter() {
         @Override
         public boolean accept(File file)

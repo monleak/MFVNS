@@ -106,15 +106,17 @@ public class DataIO {
                 }
                 String[] result = line.split(" ");
                 for(int j=1;j<result.length-1;j++){
-                    graph.listCluster[Integer.parseInt(result[0].trim())-1].add(Integer.parseInt(result[j].trim()));
+                    graph.addVertexToCluster(Integer.parseInt(result[0].trim())-1,Integer.parseInt(result[j].trim()));
                 }
             }while(true);
         }catch(Exception e){
-            System.out.println(e);
+            System.out.println(" ❌FAIL");
             return graph;
         }
-//        String clearStartMess = "\b".repeat(startMess.length());
-//        System.out.print(clearStartMess);
+        graph.sortListCluster(); //Gán nhãn lại các cluster theo số lượng đỉnh tăng dần
+        for (int i=0;i<graph.listCluster.size();i++){
+            graph.listCluster.get(i).sortListVertex(); //Gán nhãn lại các đỉnh trong cluster theo khoảng cách đến O tăng dần
+        }
         System.out.println(" ✔️DONE");
         return graph;
     }

@@ -3,19 +3,20 @@ package CTSP.benchmark;
 import CTSP.basic.Individual;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+
+import static CTSP.util.util.calDis;
 
 public class Graph {
     public int totalVertices; //tổng số đỉnh
     public ArrayList<Vertex> vertexList; //danh sách đỉnh
     public double optimal; //Giá trị tối ưu
-
     public double[][] distance; //distance[i][j] = khoảng cách từ đỉnh i đến đỉnh j
-
     public int numberOfCluster; //Số cụm
     public int sourceVertex; //Đỉnh nguồn (Trong bài CTSP không được sử dụng đến)
     public String linkFile;
 
-    public ArrayList<Integer>[] listCluster;
+    public ArrayList<Cluster> listCluster; //Danh sách các cluster
 
     public Graph(int totalVertices,int numberOfCluster, String linkFile){
         this.totalVertices = totalVertices;
@@ -24,9 +25,9 @@ public class Graph {
         this.linkFile = linkFile;
         this.numberOfCluster = numberOfCluster;
 
-        this.listCluster = new ArrayList[numberOfCluster];
-        for(int i = 0 ;i<numberOfCluster;i++){
-            listCluster[i] = new ArrayList<>();
+        this.listCluster = new ArrayList<>();
+        for(int i=0;i<numberOfCluster;i++){
+            listCluster.add(new Cluster());
         }
     }
 
@@ -40,31 +41,19 @@ public class Graph {
      * @param idVertex
      */
     public void addVertexToCluster(int idCluster, int idVertex){
-        this.listCluster[idCluster].add(idVertex);
+        this.listCluster.get(idCluster).addVertex(vertexList.get(idVertex));
     }
 
     /**
      * Sắp xếp lại các cluster theo thứ tự số lượng đỉnh tăng dần
      */
     public void sortListCluster(){
-        //TODO: cần check
-        for (int i = 0; i < numberOfCluster-1; i++){
-            // i phần tử cuối cùng đã được sắp xếp
-            boolean haveSwap = false;
-            for (int j = 0; j < numberOfCluster-i-1; j++){
-                if (this.listCluster[j].size() > this.listCluster[j+1].size()){
-                    ArrayList<Integer> temp = this.listCluster[j];
-                    this.listCluster[j] = this.listCluster[j+1];
-                    this.listCluster[j+1] = temp;
-
-                    haveSwap = true; // Kiểm tra lần lặp này có swap không
-                }
+        this.listCluster.sort(new Comparator<Cluster>() {
+            @Override
+            public int compare(Cluster o1, Cluster o2) {
+                return Integer.compare(o1.listVertex.size(), o2.listVertex.size());
             }
-            // Nếu không có swap nào được thực hiện => mảng đã sắp xếp. Không cần lặp thêm
-            if(haveSwap == false){
-                break;
-            }
-        }
+        });
 
     }
 }

@@ -1,9 +1,16 @@
 package CTSP.util;
 
 import CTSP.basic.Params;
-import CTSP.benchmark.Problem;
+import CTSP.benchmark.Graph;
 
 public class util {
+    /**
+     * Tính khoảng cách giữa 2 điểm
+     * @return
+     */
+    public static double calDis(double xA, double yA, double xB, double yB){
+        return Math.sqrt(Math.pow(xA-xB,2)+Math.pow(yA-yB,2));
+    }
     /**
      *
      * @param n
@@ -17,6 +24,11 @@ public class util {
         shuffleArray(intArray);
         return intArray;
     }
+
+    /**
+     * Hoán vị mảng nhận vào
+     * @param ar
+     */
     public static void shuffleArray(int[] ar)
     {
         for (int i = ar.length - 1; i > 0; i--)
@@ -29,36 +41,39 @@ public class util {
         }
     }
 
-    public static int[] decodeChromosome(int[] Chromosome, int totalVertices){
-        int[] decodeChromosome = new int[totalVertices];
-        int count=0;
-        for (int i=0;i<Chromosome.length;i++){
-            if(Chromosome[i] < totalVertices){
-                decodeChromosome[count++] = Chromosome[i];
+    /**
+     * Chuyển đổi thành mảng các số tăng dần bắt đầu từ start
+     * Ví dụ: array = [4,6,2,9,1,8] và start = 2
+     * Đầu ra sẽ là   [4,5,3,7,2,6]
+     * @param array Mảng cần chuyển đổi
+     * @param start Bắt đầu gán nhãn từ start
+     * @return
+     */
+    public static int[] convertOrder(int[] array, int start){
+        int[] newArr = new int[array.length];
+        int[] cloneArr = array.clone(); //Không thao tác trên mảng ban đầu tránh thay đổi dữ liệu
+        int temp = start;
+        for(int j=0;j<newArr.length;j++){
+            int min = Integer.MAX_VALUE;int idMin = -1;
+            for(int i=0;i<cloneArr.length;i++){
+                if(min > cloneArr[i] && cloneArr[i] != -1){
+                    min = cloneArr[i];
+                    idMin = i;
+                }
             }
+            newArr[idMin] = temp++;
+            cloneArr[idMin] = -1;
         }
-        return decodeChromosome;
+        return newArr;
     }
 
-    public static int[] codeChromosome(int[] decodeChromosome, int[] previousChromosome){
-        int[] newChromosome = new int[previousChromosome.length];
-        int countDecode = 0;
-        for(int i=0;i<newChromosome.length;i++){
-            if(previousChromosome[i] >= decodeChromosome.length){
-                newChromosome[i] = previousChromosome[i];
-            }else {
-                newChromosome[i] = decodeChromosome[countDecode++];
-            }
-        }
-        return newChromosome;
-    }
-    public static int giveId(int x, int y, Problem prob){
-        int p1,p2;
-        p1 = Math.min(x,y);
-        p2 = Math.max(x,y);
-        if(p1==0){
-            return p1+p2;
-        }
-        return giveId(p1-1,prob.graphs.size()-1,prob)+p2-p1+1;
-    }
+//    public static int giveId(int x, int y, Problem prob){
+//        int p1,p2;
+//        p1 = Math.min(x,y);
+//        p2 = Math.max(x,y);
+//        if(p1==0){
+//            return p1+p2;
+//        }
+//        return giveId(p1-1,prob.graphs.size()-1,prob)+p2-p1+1;
+//    }
 }

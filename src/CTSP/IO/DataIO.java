@@ -109,6 +109,8 @@ public class DataIO {
                     graph.addVertexToCluster(Integer.parseInt(result[0].trim())-1,Integer.parseInt(result[j].trim()));
                 }
             }while(true);
+
+            readBuffer.close();
         }catch(Exception e){
             System.out.println(" ❌FAIL");
             return graph;

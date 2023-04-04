@@ -47,7 +47,7 @@ public class utilCTSP {
     }
 
     /**
-     * Tính độ dài đường đi
+     * Tính độ dài đường đi trong không gian riêng
      * @param graph
      * @param Chromosome NST trong không gian chung
      * @param ClusterOrder Thứ tự thăm các cluster

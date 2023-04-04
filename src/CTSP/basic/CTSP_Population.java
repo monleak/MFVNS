@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import static CTSP.util.utilCTSP.calCost;
+
 public class CTSP_Population {
     public Problem prob;
     public ArrayList<Individual> pop;
@@ -17,6 +19,9 @@ public class CTSP_Population {
 
         this.best = new double[prob.graphs.size()];
         Arrays.fill(best,Double.MAX_VALUE);
+
+        this.init();
+        this.update();
     }
 
     /**
@@ -25,28 +30,33 @@ public class CTSP_Population {
     public void init(){
         while (pop.size() < Params.POP_SIZE){
             Individual individual = new Individual(prob.maxTotalVertices, prob.numberOfGraph,prob.maxNumberOfCluster,prob.numberOfVerticesPerCluster);
+            for(int i=0;i<prob.numberOfGraph;i++){
+                individual.cost[i] = calCost(prob.graphs.get(i),individual.Chromosome,individual.ClusterOrder,prob.numberOfVerticesPerCluster);
+            }
             pop.add(individual);
         }
-
     }
+
+    /**
+     * Cập nhật skillfactor và sizePop
+     * Cập nhật best
+     */
     public void update(){
         //reset rank
         for(int idIndiv = 0;idIndiv < pop.size();idIndiv++){
             pop.get(idIndiv).rank = -1;
         }
         //Set skillfactor, rank and sort pop
-        for (int elementTestCase = 0;elementTestCase < prob.testCase.get(testCase).length;elementTestCase++){
-            //xếp rank các cá thể theo từng graph
-            sortPop(prob.testCase.get(testCase)[elementTestCase]);
-
+        for(int task=0;task<prob.numberOfGraph;task++){
+            sortPop(task);
             for(int idIndiv = 0;idIndiv < pop.size();idIndiv++){
                 if(pop.get(idIndiv).rank == -1 || pop.get(idIndiv).rank > idIndiv){
                     pop.get(idIndiv).rank = idIndiv;
-                    pop.get(idIndiv).skillfactor = prob.testCase.get(testCase)[elementTestCase];
+                    pop.get(idIndiv).skillfactor = task;
                 }
             }
-            if(best[prob.testCase.get(testCase)[elementTestCase]] > pop.get(0).cost[prob.testCase.get(testCase)[elementTestCase]]){
-                best[prob.testCase.get(testCase)[elementTestCase]] = pop.get(0).cost[prob.testCase.get(testCase)[elementTestCase]];
+            if(best[task] > pop.get(0).cost[task]){
+                best[task] = pop.get(0).cost[task];
             }
         }
         sortPopByRank();
@@ -55,8 +65,12 @@ public class CTSP_Population {
             pop.remove(pop.size()-1);
         }
     }
+
+    /**
+     * Sắp xếp lại các cá thể trong quần thể dựa trên cost
+     * @param idGraph
+     */
     public void sortPop(int idGraph) {
-        //Sắp xếp lại các cá thể trong quần thể
         this.pop.sort(new Comparator<Individual>() {
             @Override
             public int compare(Individual o1, Individual o2) {
@@ -64,8 +78,11 @@ public class CTSP_Population {
             }
         });
     }
+
+    /**
+     * Sắp xếp lại các cá thể trong quần thể dựa trên rank
+     */
     public void sortPopByRank() {
-        //Sắp xếp lại các cá thể trong quần thể
         this.pop.sort(new Comparator<Individual>() {
             @Override
             public int compare(Individual o1, Individual o2) {

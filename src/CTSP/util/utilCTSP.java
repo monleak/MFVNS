@@ -48,10 +48,14 @@ public class utilCTSP {
 
     /**
      * Tính độ dài đường đi
-     *
+     * @param graph
+     * @param Chromosome NST trong không gian chung
+     * @param ClusterOrder Thứ tự thăm các cluster
+     * @param NOVPCinCommonSpace Số lượng đỉnh mỗi cluster trong không gian chung
+     * @return Độ dài đường đi
      */
     public static double calCost(Graph graph, int[] Chromosome, int[] ClusterOrder, int[] NOVPCinCommonSpace){
-        double cost = Double.MAX_VALUE;
+        double cost = 0;
 
         int[] NOVPCinPrivateSpace = new int[graph.numberOfCluster];
         for(int i=0;i<graph.numberOfCluster;i++){
@@ -79,14 +83,21 @@ public class utilCTSP {
         }
         //Tổng giá trị đường đi = tổng độ dài đường đi trong cluster + tổng độ dài đoạn nối các cluster
         //Tính tổng độ dài các đoạn nối
+        //TODO: check
         double totalCostLink = 0;
         for(int i=0;i<graph.numberOfCluster-1;i++){
             totalCostLink += graph.distance
                             [graph.listCluster.get(i).listVertex.get(listClusterSegment.get(i)[listClusterSegment.get(i).length-1]).id-1]
                             [graph.listCluster.get(i+1).listVertex.get(listClusterSegment.get(i+1)[listClusterSegment.get(i+1).length-1]).id-1];
-            //TODO: check
         }
+        totalCostLink += graph.distance
+                [graph.listCluster.get(graph.numberOfCluster-1).listVertex.get(listClusterSegment.get(graph.numberOfCluster-1)[listClusterSegment.get(graph.numberOfCluster-1).length-1]).id-1]
+                [graph.listCluster.get(0).listVertex.get(listClusterSegment.get(0)[listClusterSegment.get(0).length-1]).id-1];
 
+        for(double temp : totalCostInCluster){
+            cost+=temp;
+        }
+        cost+=totalCostLink;
         Params.countEvals++;
         return cost;
     }

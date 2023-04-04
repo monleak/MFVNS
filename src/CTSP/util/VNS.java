@@ -2,6 +2,7 @@ package CTSP.util;
 
 import CTSP.basic.Individual;
 import CTSP.basic.Params;
+import TSP.benchmark.Graph;
 
 import java.util.Arrays;
 
@@ -9,7 +10,6 @@ import static CTSP.util.util.codeChromosome;
 import static CTSP.util.util.decodeChromosome;
 
 public class VNS {
-    //TODO: Chuyển các hàm thuộc VNS trong core.MFVNS qua đây
     /**
      * Sử dụng double bridge để biến đổi gen ban đầu
      *
@@ -20,9 +20,9 @@ public class VNS {
         int[] x = Chromosome.clone();
         if(Chromosome.length < 8){
             int p1,p2;
-            p1 = Params.rand.nextInt(Params.maxTotalVertices);
+            p1 = Params.rand.nextInt(Chromosome.length);
             do{
-                p2 = Params.rand.nextInt(Params.maxTotalVertices);
+                p2 = Params.rand.nextInt(Chromosome.length);
             }while (p2==p1);
 
             int temp = x[p1];
@@ -91,7 +91,7 @@ public class VNS {
      * @param  type Loại localSearch lựa chọn (1 - swap, 2 - 2opt)
      * @return boolean Có cải thiện sau khi search hay không (T/F)
      */
-    public static boolean localSearch(Individual indiv, int type){
+    public static boolean localSearch(Individual indiv, int type, Graph graph){
         boolean positive = false;
         int[] path = indiv.Chromosome.clone();
         path = Shaking(path);

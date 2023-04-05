@@ -42,4 +42,14 @@ public class Individual  implements Comparable<Individual> {
     public int compareTo(Individual o) {
         return Double.valueOf(this.cost[0]).compareTo(o.cost[0]);
     }
+
+    public Individual clone(){
+        Individual cloneIndividual = new Individual(this.Chromosome.length, this.cost.length, this.ClusterOrder.length, this.NOVPCinCommonSpace);
+        cloneIndividual.Chromosome = this.Chromosome.clone();
+        cloneIndividual.ClusterOrder = this.ClusterOrder.clone();
+        cloneIndividual.cost = this.cost.clone();
+        cloneIndividual.skillfactor = this.skillfactor;
+        cloneIndividual.rank = this.rank;
+        return cloneIndividual;
+    }
 }

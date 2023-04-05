@@ -51,18 +51,16 @@ public class utilCTSP {
     /**
      * Tính độ dài đường đi trong không gian riêng
      * @param graph
-     * @param Chromosome NST trong không gian chung
-     * @param NOVPCinCommonSpace Số lượng đỉnh mỗi cluster trong không gian chung
+     * @param decodeChromosome NST trong không gian riêng
      * @return Độ dài đường đi
      */
-    public static double calCost(Graph graph, int[] Chromosome, int[] NOVPCinCommonSpace){
+    public static double calCost(Graph graph, int[] decodeChromosome){
         double cost = 0;
         int[] ClusterOrder = new int[graph.numberOfCluster];
         int[] NOVPCinPrivateSpace = new int[graph.numberOfCluster];
         for(int i=0;i<graph.numberOfCluster;i++){
             NOVPCinPrivateSpace[i] = graph.listCluster.get(i).listVertex.size();
         }
-        int[] decodeChromose = decodeChromosome(graph.totalVertices, Chromosome, NOVPCinCommonSpace, NOVPCinPrivateSpace);
 
         //Tính độ dài đường đi trong các cluster
         double[] totalCostInCluster = new double[graph.numberOfCluster];
@@ -74,7 +72,7 @@ public class utilCTSP {
         for(int i=0;i<graph.numberOfCluster;i++){
             int[] clusterSegment = new int[NOVPCinPrivateSpace[i]];
             for(int j=0;j<clusterSegment.length;j++){
-                clusterSegment[j] = decodeChromose[j+pointPrivateSpace[i]];
+                clusterSegment[j] = decodeChromosome[j+pointPrivateSpace[i]];
             }
             clusterSegment = convertOrder(clusterSegment,0);
             listClusterSegment.add(clusterSegment);

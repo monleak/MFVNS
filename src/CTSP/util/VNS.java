@@ -2,12 +2,11 @@ package CTSP.util;
 
 import CTSP.basic.Individual;
 import CTSP.basic.Params;
-import TSP.benchmark.Graph;
+import CTSP.benchmark.Graph;
 
 import java.util.Arrays;
 
-import static CTSP.util.util.codeChromosome;
-import static CTSP.util.util.decodeChromosome;
+import static CTSP.util.utilCTSP.calCost;
 
 public class VNS {
     /**
@@ -87,85 +86,57 @@ public class VNS {
     /**
      * Di chuyển cá thể hiện tại tới lời giải tốt nhất trong tập các lời giải lân cận
      *
-     * @param  indiv Cá thể ban đầu
-     * @param  type Loại localSearch lựa chọn (1 - swap, 2 - 2opt)
+     * @param indiv Cá thể ban đầu
+     * @param type Loại localSearch lựa chọn (1 - swap, 2 - 2opt)
+     * @param graph Đồ thị cần trùng với skillfactor của cá thể
      * @return boolean Có cải thiện sau khi search hay không (T/F)
      */
     public static boolean localSearch(Individual indiv, int type, Graph graph){
+        //TODO: decode trước khi local search
         boolean positive = false;
-        // int[] path = indiv.Chromosome.clone();
-        // path = Shaking(path);
-        // path = decodeChromosome(path,prob.graphs.get(indiv.skillfactor).totalVertices);
-        // double curLength = 0;
-        // for(int i=0;i<path.length-1;i++){
-        //     curLength += prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+1]];
-        // }
-        // curLength += prob.graphs.get(indiv.skillfactor).distance[path[path.length-1]][path[0]];
 
-        Individual cloneIndiv = indiv.clone();
-        cloneIndiv.Chromosome = Shaking(cloneIndiv.Chromosome);
-        cloneIndiv.cost[cloneIndiv.skillfactor] = CTSP.util.utilCTSP.calCost(graph,cloneIndiv.Chromosome,cloneIndiv.ClusterOrder,cloneIndiv.NOVPCinCommonSpace);
-//        Params.countEvals++;
+        int[] cloneChromosome = Shaking(indiv.Chromosome.clone());
+        double curLength = calCost(graph,cloneChromosome, indiv.NOVPCinCommonSpace);
         //--------------swap-------------
         if(type == 1){
             double minDelta = 0;
             int min_i = -1;
-            for(int i=0;i< path.length;i++){
+            for(int i=0;i< cloneChromosome.length;i++){
                 double deltaLength=0;
-                if(i==0){
-                    deltaLength = - prob.graphs.get(indiv.skillfactor).distance[path[i]][path[path.length-1]] - prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[i+2]]
-                            + prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[path.length-1]] + prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+2]];
-                }else if(i == path.length-1){
-                    deltaLength = - prob.graphs.get(indiv.skillfactor).distance[path[i-1]][path[i]] - prob.graphs.get(indiv.skillfactor).distance[path[0]][path[1]]
-                            + prob.graphs.get(indiv.skillfactor).distance[path[0]][path[i-1]] + prob.graphs.get(indiv.skillfactor).distance[path[i]][path[1]];
-                }else if(i == path.length-2){
-                    deltaLength = - prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i-1]] - prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[0]]
-                            + prob.graphs.get(indiv.skillfactor).distance[path[i-1]][path[i+1]] + prob.graphs.get(indiv.skillfactor).distance[path[i]][path[0]];
-                }
-                else {
-                    deltaLength = -prob.graphs.get(indiv.skillfactor).distance[path[i-1]][path[i]] - prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[i+2]]
-                            +prob.graphs.get(indiv.skillfactor).distance[path[i-1]][path[i+1]] + prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+2]];
-                }
+                int[] path = swapPath(cloneChromosome.clone(),i);
+                deltaLength = calCost(graph,path,indiv.NOVPCinCommonSpace) - curLength;
                 if(deltaLength < minDelta){
                     minDelta = deltaLength;
                     min_i = i;
                 }
             }
             if(minDelta < 0){
-                curLength = curLength + minDelta;
-                path = swapPath(path,min_i);
+                curLength += minDelta;
+                cloneChromosome = swapPath(cloneChromosome,min_i);
             }
         } else
             //-------------swap--------------
             //------------------2-opt---------------
-            if(type == 2){
-                for(int i=0; i < path.length - 1; i++) {
-                    for(int j=i+1; j < path.length; j++) {
-                        double lengthDelta;
-                        if(j != path.length-1){
-                            lengthDelta = - prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+1]] - prob.graphs.get(indiv.skillfactor).distance[path[j]][path[j+1]]
-                                    + prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[j+1]] + prob.graphs.get(indiv.skillfactor).distance[path[i]][path[j]];
-                        }else {
-                            lengthDelta = - prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+1]] - prob.graphs.get(indiv.skillfactor).distance[path[j]][path[0]]
-                                    + prob.graphs.get(indiv.skillfactor).distance[path[i+1]][path[0]] + prob.graphs.get(indiv.skillfactor).distance[path[i]][path[j]];
-                        }
-//                Params.countEvals ++;
+        if(type == 2){
+            for(int i=0; i < cloneChromosome.length - 1; i++) {
+                for(int j=i+1; j < cloneChromosome.length; j++) {
+                    double lengthDelta = 0;
+                    int[] path = do_2_Opt(cloneChromosome.clone(),i,j);
+                    lengthDelta = calCost(graph,path,indiv.NOVPCinCommonSpace) - curLength;
 
-                        if (lengthDelta < 0) {
-                            path = do_2_Opt(path, i, j);
-                            curLength += lengthDelta;
-                        }
+                    if (lengthDelta < 0) {
+                        cloneChromosome = do_2_Opt(cloneChromosome, i, j);
+                        curLength += lengthDelta;
                     }
                 }
             }
+        }
         //------------------------------------------
 
         if(curLength < indiv.cost[indiv.skillfactor]){
-//            Individual newIndiv = new Individual(codeChromosome(path,indiv.Chromosome),curLength,indiv.skillfactor);
-//            this.pop.pop.add(newIndiv);
             Arrays.fill(indiv.cost,Double.MAX_VALUE);
             indiv.cost[indiv.skillfactor] = curLength;
-            indiv.Chromosome = codeChromosome(path,indiv.Chromosome);
+            indiv.Chromosome = cloneChromosome;
             positive = true;
         }
         return positive;

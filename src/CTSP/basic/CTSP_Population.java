@@ -16,18 +16,6 @@ public class CTSP_Population {
     public CTSP_Population(Problem prob){
         this.prob = prob;
         pop = new ArrayList<>();
-
-        this.best = new double[prob.graphs.size()];
-        Arrays.fill(best,Double.MAX_VALUE);
-
-        this.init();
-        this.update();
-    }
-
-    /**
-     * Khởi tạo quẩn thể và tính cost
-     */
-    public void init(){
         while (pop.size() < Params.POP_SIZE){
             Individual individual = new Individual(prob.maxTotalVertices, prob.numberOfGraph,prob.numberOfVerticesPerCluster);
             for(int i=0;i<prob.numberOfGraph;i++){
@@ -35,11 +23,17 @@ public class CTSP_Population {
             }
             pop.add(individual);
         }
+
+        this.best = new double[prob.graphs.size()];
+        Arrays.fill(best,Double.MAX_VALUE);
+
+        this.update();
     }
 
     /**
      * Cập nhật skillfactor và sizePop
      * Cập nhật best
+     * Cập nhật kích thước quần thể
      */
     public void update(){
         //reset rank

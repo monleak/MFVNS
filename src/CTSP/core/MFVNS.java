@@ -14,21 +14,21 @@ public class MFVNS {
     public CTSP_Population pop;
     public double[] best;
     public Problem prob;
-    public int testCase;
-
     public double rmp[]; //Bộ nhớ lịch sử thành công rmp
-    public ArrayList<Double>[] s_rmp; //   Lưu trữ các giá trị thành công từng thế hệ
-                                    //     Sử dụng để cập nhật bộ nhớ lịch sử thành công sau mỗi thế hệ
+
+    /**
+     * Lưu trữ các giá trị thành công từng thế hệ
+     * Sử dụng để cập nhật bộ nhớ lịch sử thành công sau mỗi thế hệ
+     */
+    public ArrayList<Double>[] s_rmp;
     public ArrayList<Double>[] diff_f_inter_x; //Sử dụng để tính độ ảnh hưởng của index i đến việc cập nhật rmp[]
 
-    public MFVNS(Problem prob, int testCase){
+    public MFVNS(Problem prob){
         this.prob = prob;
-        this.testCase = testCase;
         best = new double[prob.graphs.size()];
         Arrays.fill(best,Double.MAX_VALUE);
 
-        pop = new CTSP_Population(prob,testCase);
-        pop.init();
+        pop = new CTSP_Population(prob);
 
         rmp = new double[(prob.graphs.size()+1)*prob.graphs.size()/2];
         Arrays.fill(rmp,0.5);
@@ -142,10 +142,9 @@ public class MFVNS {
             count++;
         }
     }
+
     /**
      * Update quần thể khi qua thế hệ mới
-     *
-     * @return void
      */
     public void update(){
         //TODO: Check lại update rank

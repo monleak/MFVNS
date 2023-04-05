@@ -67,6 +67,28 @@ public class util {
         return newArr;
     }
 
+    /**
+     * Chuyển đổi mảng ban đầu thành mảng thứ tự các phần tử được sắp xếp giảm dần
+     * Ví dụ: array = [4,6,2,9,1,8] sẽ được biến đổi thành
+     *                [4,6,2,1,3,5]
+     * @param array
+     * @return
+     */
+    public static int[] convertOrder2(int[] array){
+        int[] newArr = new int[array.length];
+        for(int i=0;i<newArr.length;i++){
+            int max = 0;int idMax = -1;
+            for(int j=0;j<array.length;j++){
+                if(max < array[j]){
+                    max = array[j];
+                    idMax = j;
+                    array[j] = -1;
+                }
+            }
+            newArr[i] = idMax;
+        }
+        return newArr;
+    }
 //    public static int giveId(int x, int y, Problem prob){
 //        int p1,p2;
 //        p1 = Math.min(x,y);

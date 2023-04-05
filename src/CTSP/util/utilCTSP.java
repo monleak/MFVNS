@@ -4,8 +4,10 @@ import CTSP.basic.Params;
 import CTSP.benchmark.Graph;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static CTSP.util.util.convertOrder;
+import static CTSP.util.util.convertOrder2;
 
 public class utilCTSP {
     /**
@@ -50,13 +52,12 @@ public class utilCTSP {
      * Tính độ dài đường đi trong không gian riêng
      * @param graph
      * @param Chromosome NST trong không gian chung
-     * @param ClusterOrder Thứ tự thăm các cluster
      * @param NOVPCinCommonSpace Số lượng đỉnh mỗi cluster trong không gian chung
      * @return Độ dài đường đi
      */
-    public static double calCost(Graph graph, int[] Chromosome, int[] ClusterOrder, int[] NOVPCinCommonSpace){
+    public static double calCost(Graph graph, int[] Chromosome, int[] NOVPCinCommonSpace){
         double cost = 0;
-
+        int[] ClusterOrder = new int[graph.numberOfCluster];
         int[] NOVPCinPrivateSpace = new int[graph.numberOfCluster];
         for(int i=0;i<graph.numberOfCluster;i++){
             NOVPCinPrivateSpace[i] = graph.listCluster.get(i).listVertex.size();
@@ -80,19 +81,20 @@ public class utilCTSP {
             for(int j=0;j<clusterSegment.length-1;j++){
                 totalCostInCluster[i] += graph.distance[graph.listCluster.get(i).listVertex.get(j).id-1][graph.listCluster.get(i).listVertex.get(j+1).id-1];
             }
+            ClusterOrder[i] = Arrays.stream(clusterSegment).sum();
         }
+        ClusterOrder = convertOrder2(ClusterOrder);
         //Tổng giá trị đường đi = tổng độ dài đường đi trong cluster + tổng độ dài đoạn nối các cluster
         //Tính tổng độ dài các đoạn nối
-        //TODO: check
         double totalCostLink = 0;
         for(int i=0;i<graph.numberOfCluster-1;i++){
             totalCostLink += graph.distance
-                            [graph.listCluster.get(i).listVertex.get(listClusterSegment.get(i)[listClusterSegment.get(i).length-1]).id-1]
-                            [graph.listCluster.get(i+1).listVertex.get(listClusterSegment.get(i+1)[listClusterSegment.get(i+1).length-1]).id-1];
+                            [graph.listCluster.get(ClusterOrder[i]).listVertex.get(listClusterSegment.get(ClusterOrder[i])[listClusterSegment.get(ClusterOrder[i]).length-1]).id-1]
+                            [graph.listCluster.get(ClusterOrder[i+1]).listVertex.get(listClusterSegment.get(ClusterOrder[i+1])[listClusterSegment.get(ClusterOrder[i+1]).length-1]).id-1];
         }
         totalCostLink += graph.distance
-                [graph.listCluster.get(graph.numberOfCluster-1).listVertex.get(listClusterSegment.get(graph.numberOfCluster-1)[listClusterSegment.get(graph.numberOfCluster-1).length-1]).id-1]
-                [graph.listCluster.get(0).listVertex.get(listClusterSegment.get(0)[listClusterSegment.get(0).length-1]).id-1];
+                [graph.listCluster.get(ClusterOrder[graph.numberOfCluster-1]).listVertex.get(listClusterSegment.get(ClusterOrder[graph.numberOfCluster-1])[listClusterSegment.get(ClusterOrder[graph.numberOfCluster-1]).length-1]).id-1]
+                [graph.listCluster.get(ClusterOrder[0]).listVertex.get(listClusterSegment.get(ClusterOrder[0])[listClusterSegment.get(ClusterOrder[0]).length-1]).id-1];
 
         for(double temp : totalCostInCluster){
             cost+=temp;

@@ -93,14 +93,18 @@ public class VNS {
      */
     public static boolean localSearch(Individual indiv, int type, Graph graph){
         boolean positive = false;
-        int[] path = indiv.Chromosome.clone();
-        path = Shaking(path);
-        path = decodeChromosome(path,prob.graphs.get(indiv.skillfactor).totalVertices);
-        double curLength = 0;
-        for(int i=0;i<path.length-1;i++){
-            curLength += prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+1]];
-        }
-        curLength += prob.graphs.get(indiv.skillfactor).distance[path[path.length-1]][path[0]];
+        // int[] path = indiv.Chromosome.clone();
+        // path = Shaking(path);
+        // path = decodeChromosome(path,prob.graphs.get(indiv.skillfactor).totalVertices);
+        // double curLength = 0;
+        // for(int i=0;i<path.length-1;i++){
+        //     curLength += prob.graphs.get(indiv.skillfactor).distance[path[i]][path[i+1]];
+        // }
+        // curLength += prob.graphs.get(indiv.skillfactor).distance[path[path.length-1]][path[0]];
+
+        Individual cloneIndiv = indiv.clone();
+        cloneIndiv.Chromosome = Shaking(cloneIndiv.Chromosome);
+        cloneIndiv.cost[cloneIndiv.skillfactor] = CTSP.util.utilCTSP.calCost(graph,cloneIndiv.Chromosome,cloneIndiv.ClusterOrder,cloneIndiv.NOVPCinCommonSpace);
 //        Params.countEvals++;
         //--------------swap-------------
         if(type == 1){

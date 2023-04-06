@@ -6,7 +6,7 @@ import CTSP.benchmark.Graph;
 
 import java.util.Arrays;
 
-import static CTSP.util.utilCTSP.calCost;
+import static CTSP.util.utilCTSP.*;
 
 public class VNS {
     /**
@@ -95,21 +95,27 @@ public class VNS {
         //TODO: decode trước khi local search
         boolean positive = false;
 
+        //Shaking
         int[] cloneChromosome = Shaking(indiv.Chromosome.clone());
-        double curLength = calCost(graph,cloneChromosome, indiv.NOVPCinCommonSpace);
+        int[] NOVPCinPrivateSpace = new int[graph.numberOfCluster];
+        for(int i=0;i<graph.numberOfCluster;i++){
+            NOVPCinPrivateSpace[i] = graph.listCluster.get(i).listVertex.size();
+        }
+        int[] decodeCloneChromosome = decodeChromosome(cloneChromosome.length,cloneChromosome, indiv.NOVPCinCommonSpace, NOVPCinPrivateSpace);
+        double curLength = calCostWithoutDecode(graph,decodeCloneChromosome,NOVPCinPrivateSpace);
         //--------------swap-------------
         if(type == 1){
             double minDelta = 0;
             int min_i = -1;
-            for(int i=0;i< cloneChromosome.length;i++){
+            for(int i=0;i< decodeCloneChromosome.length;i++){
                 double deltaLength=0;
-                int[] path = swapPath(cloneChromosome.clone(),i);
-                deltaLength = calCost(graph,path,indiv.NOVPCinCommonSpace) - curLength;
+                int[] path = swapPath(decodeCloneChromosome.clone(),i);
+                deltaLength = calCostWithoutDecode(graph,path,NOVPCinPrivateSpace) - curLength;
                 if(deltaLength < minDelta){
                     minDelta = deltaLength;
                     min_i = i;
                 }
-            }
+            } //TODO: check
             if(minDelta < 0){
                 curLength += minDelta;
                 cloneChromosome = swapPath(cloneChromosome,min_i);

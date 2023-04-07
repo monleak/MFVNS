@@ -43,9 +43,17 @@ public class utilCTSP {
         return decodeChromosome;
     }
 
-
-    public static void encodeChromosome(){
-
+    /**
+     * Mã hóa cá thể tử không gian riêng vào không gian chung
+     * Lưu ý cần đảm bảo thứ tự di chuyển giữa các cluster
+     * (Thứ tự di chuyển giữa các cluster được quyết định bằng trung bình cộng các nút trong cluster theo thứ tự giảm dần: Lớn hơn đi trước)
+     * @param decodeChromosome
+     * @param oldChromosome
+     * @param NOVPCinCommonSpace
+     * @param NOVPCinPrivateSpace
+     */
+    public static void encodeChromosome(int[] decodeChromosome, int[] oldChromosome, int[] NOVPCinCommonSpace, int[] NOVPCinPrivateSpace){
+        
     }
 
     /**

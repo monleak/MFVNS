@@ -92,17 +92,17 @@ public class VNS {
      * @return boolean Có cải thiện sau khi search hay không (T/F)
      */
     public static boolean localSearch(Individual indiv, int type, Graph graph){
-        //TODO: decode trước khi local search
         boolean positive = false;
 
         //Shaking
-        int[] cloneChromosome = Shaking(indiv.Chromosome.clone());
         int[] NOVPCinPrivateSpace = new int[graph.numberOfCluster];
         for(int i=0;i<graph.numberOfCluster;i++){
             NOVPCinPrivateSpace[i] = graph.listCluster.get(i).listVertex.size();
         }
+        int[] cloneChromosome = indiv.Chromosome.clone();
         int[] decodeCloneChromosome = decodeChromosome(cloneChromosome.length,cloneChromosome, indiv.NOVPCinCommonSpace, NOVPCinPrivateSpace);
-        double curLength = calCostWithoutDecode(graph,decodeCloneChromosome,NOVPCinPrivateSpace);
+        decodeCloneChromosome = Shaking(decodeCloneChromosome);
+        double curLength = calCost(graph,decodeCloneChromosome,NOVPCinPrivateSpace,2);
         //--------------swap-------------
         if(type == 1){
             double minDelta = 0;
@@ -110,7 +110,7 @@ public class VNS {
             for(int i=0;i< decodeCloneChromosome.length;i++){
                 double deltaLength=0;
                 int[] path = swapPath(decodeCloneChromosome.clone(),i);
-                deltaLength = calCostWithoutDecode(graph,path,NOVPCinPrivateSpace) - curLength;
+                deltaLength = calCost(graph,path,NOVPCinPrivateSpace,2) - curLength;
                 if(deltaLength < minDelta){
                     minDelta = deltaLength;
                     min_i = i;
@@ -118,27 +118,27 @@ public class VNS {
             } //TODO: check
             if(minDelta < 0){
                 curLength += minDelta;
-                cloneChromosome = swapPath(cloneChromosome,min_i);
+                decodeCloneChromosome = swapPath(decodeCloneChromosome,min_i);
             }
-        } else
+        }
             //-------------swap--------------
             //------------------2-opt---------------
-        if(type == 2){
-            for(int i=0; i < cloneChromosome.length - 1; i++) {
-                for(int j=i+1; j < cloneChromosome.length; j++) {
+        else if(type == 2){
+            for(int i=0; i < decodeCloneChromosome.length - 1; i++) {
+                for(int j=i+1; j < decodeCloneChromosome.length; j++) {
                     double lengthDelta = 0;
-                    int[] path = do_2_Opt(cloneChromosome.clone(),i,j);
+                    int[] path = do_2_Opt(decodeCloneChromosome.clone(),i,j);
                     lengthDelta = calCost(graph,path,indiv.NOVPCinCommonSpace) - curLength;
 
                     if (lengthDelta < 0) {
-                        cloneChromosome = do_2_Opt(cloneChromosome, i, j);
+                        decodeCloneChromosome = do_2_Opt(decodeCloneChromosome, i, j);
                         curLength += lengthDelta;
                     }
                 }
             }
         }
-        //------------------------------------------
-
+        //--------------------2-opt----------------------
+        //TODO: encode
         if(curLength < indiv.cost[indiv.skillfactor]){
             Arrays.fill(indiv.cost,Double.MAX_VALUE);
             indiv.cost[indiv.skillfactor] = curLength;

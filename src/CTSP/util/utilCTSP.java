@@ -45,8 +45,6 @@ public class utilCTSP {
 
     /**
      * Mã hóa cá thể tử không gian riêng vào không gian chung
-     * Lưu ý cần đảm bảo thứ tự di chuyển giữa các cluster
-     * (Thứ tự di chuyển giữa các cluster được quyết định bằng trung bình cộng các nút trong cluster theo thứ tự giảm dần: Lớn hơn đi trước)
      * @param decodeChromosome
      * @param oldChromosome
      * @param NOVPCinCommonSpace
@@ -59,20 +57,28 @@ public class utilCTSP {
 
     /**
      * Tính độ dài đường đi trong không gian riêng
+     * (Thứ tự di chuyển giữa các cluster được quyết định bằng trung bình cộng các nút trong cluster theo thứ tự giảm dần: Lớn hơn đi trước)
+     * Thứ tự di chuyển giữa cluster sẽ được tính sau khi decode
      *
      * @param graph
      * @param Chromosome
      * @param NOVPCinCommonSpace
+     * @param type 1-Chromosome thuộc không gian chung, 2-Chromosome thuộc KG riêng
      * @return Độ dài đường đi
      */
-    public static double calCost(Graph graph, int[] Chromosome, int[] NOVPCinCommonSpace){
+    public static double calCost(Graph graph, int[] Chromosome, int[] NOVPCinCommonSpace, int type){
         double cost = 0;
         int[] ClusterOrder = new int[graph.numberOfCluster];
         int[] NOVPCinPrivateSpace = new int[graph.numberOfCluster];
         for(int i=0;i<graph.numberOfCluster;i++){
             NOVPCinPrivateSpace[i] = graph.listCluster.get(i).listVertex.size();
         }
-        int[] decodeChromosome = decodeChromosome(graph.totalVertices, Chromosome,NOVPCinCommonSpace,NOVPCinPrivateSpace);
+        if(type == 1){
+            int[] decodeChromosome = decodeChromosome(graph.totalVertices, Chromosome,NOVPCinCommonSpace,NOVPCinPrivateSpace);
+        }else if(type == 2){
+            int[] decodeChromosome = Chromosome.clone(); 
+        }
+        
         //Tính độ dài đường đi trong các cluster
         double[] totalCostInCluster = new double[graph.numberOfCluster];
         int[] pointPrivateSpace = new int[NOVPCinPrivateSpace.length];
@@ -112,85 +118,5 @@ public class utilCTSP {
         cost+=totalCostLink;
         Params.countEvals++;
         return cost;
-    }
-
-    /**
-     * Hàm tính độ dài đường đi nhưng gen truyền vào là gen đã được mã hóa ra không gian riêng
-     * @param graph
-     * @param decodeChromosome
-     * @param NOVPCinPrivateSpace
-     * @return
-     */
-    public static double calCostWithoutDecode(Graph graph, int[] decodeChromosome, int[] NOVPCinPrivateSpace){
-        double cost = 0;
-        int[] ClusterOrder = new int[graph.numberOfCluster];
-
-        //Tính độ dài đường đi trong các cluster
-        double[] totalCostInCluster = new double[graph.numberOfCluster];
-        int[] pointPrivateSpace = new int[NOVPCinPrivateSpace.length];
-        for(int i=0;i<pointPrivateSpace.length;i++){
-            pointPrivateSpace[i] = i == 0 ? 0 : (pointPrivateSpace[i-1]+NOVPCinPrivateSpace[i]);
-        }
-        //TODO:  nhớ convertOrder
-        ArrayList<int[]> listClusterSegment = getListClusterSegment(graph.numberOfCluster,NOVPCinPrivateSpace,decodeChromosome,pointPrivateSpace);
-        for(int i=0;i<listClusterSegment.size();i++){
-            ClusterOrder[i] = Arrays.stream(listClusterSegment.get(i)).sum()/listClusterSegment.get(i).length;
-            listClusterSegment.set(i, convertOrder(listClusterSegment.get(i),0));
-            for(int j=0;j<listClusterSegment.get(i).length-1;j++){ //TODO: check
-                totalCostInCluster[i] += graph.distance[graph.listCluster.get(i).listVertex.get(j).id-1][graph.listCluster.get(i).listVertex.get(j+1).id-1];
-            }
-        }
-        // for(int i=0;i<graph.numberOfCluster;i++){
-        //     int[] clusterSegment = new int[NOVPCinPrivateSpace[i]];
-        //     for(int j=0;j<clusterSegment.length;j++){
-        //         clusterSegment[j] = decodeChromosome[j+pointPrivateSpace[i]];
-        //     }
-        //     ClusterOrder[i] = Arrays.stream(clusterSegment).sum()/clusterSegment.length;
-        //     clusterSegment = convertOrder(clusterSegment,0);
-        //     listClusterSegment.add(clusterSegment);
-        //     for(int j=0;j<clusterSegment.length-1;j++){
-        //         totalCostInCluster[i] += graph.distance[graph.listCluster.get(i).listVertex.get(j).id-1][graph.listCluster.get(i).listVertex.get(j+1).id-1];
-        //     }
-        // }
-        //Thứ tự di chuyển giữa các cluster được sắp xếp dựa trên trung bình cộng clusterSegment
-        ClusterOrder = convertOrder2(ClusterOrder);
-        //Tổng giá trị đường đi = tổng độ dài đường đi trong cluster + tổng độ dài đoạn nối các cluster
-        //Tính tổng độ dài các đoạn nối
-        double totalCostLink = 0;
-        for(int i=0;i<graph.numberOfCluster-1;i++){
-            totalCostLink += graph.distance
-                    [graph.listCluster.get(ClusterOrder[i]).listVertex.get(listClusterSegment.get(ClusterOrder[i])[listClusterSegment.get(ClusterOrder[i]).length-1]).id-1]
-                    [graph.listCluster.get(ClusterOrder[i+1]).listVertex.get(listClusterSegment.get(ClusterOrder[i+1])[listClusterSegment.get(ClusterOrder[i+1]).length-1]).id-1];
-        }
-        totalCostLink += graph.distance
-                [graph.listCluster.get(ClusterOrder[graph.numberOfCluster-1]).listVertex.get(listClusterSegment.get(ClusterOrder[graph.numberOfCluster-1])[listClusterSegment.get(ClusterOrder[graph.numberOfCluster-1]).length-1]).id-1]
-                [graph.listCluster.get(ClusterOrder[0]).listVertex.get(listClusterSegment.get(ClusterOrder[0])[listClusterSegment.get(ClusterOrder[0]).length-1]).id-1];
-
-        for(double temp : totalCostInCluster){
-            cost+=temp;
-        }
-        cost+=totalCostLink;
-        Params.countEvals++;
-        return cost;
-    }
-
-    /**
-     * Cắt các đoạn cluster ra từ NST ban đầu
-     * @param numberOfCluster
-     * @param NOVPCinPrivateSpace
-     * @param decodeChromosome
-     * @param pointPrivateSpace
-     * @return 
-     */
-    public static ArrayList<int[]> getListClusterSegment(int numberOfCluster, int[] NOVPCinPrivateSpace, int[] decodeChromosome, int[] pointPrivateSpace){
-        ArrayList<int[]> listClusterSegment = new ArrayList<>();
-        for(int i=0;i<numberOfCluster;i++){
-            int[] clusterSegment = new int[NOVPCinPrivateSpace[i]];
-            for(int j=0;j<clusterSegment.length;j++){
-                clusterSegment[j] = decodeChromosome[j+pointPrivateSpace[i]];
-            }
-            listClusterSegment.add(clusterSegment);
-        }
-        return listClusterSegment;
     }
 }

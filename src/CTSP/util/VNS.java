@@ -128,7 +128,7 @@ public class VNS {
                 for(int j=i+1; j < decodeCloneChromosome.length; j++) {
                     double lengthDelta = 0;
                     int[] path = do_2_Opt(decodeCloneChromosome.clone(),i,j);
-                    lengthDelta = calCost(graph,path,indiv.NOVPCinCommonSpace) - curLength;
+                    lengthDelta = calCost(graph,path,indiv.NOVPCinCommonSpace,2) - curLength;
 
                     if (lengthDelta < 0) {
                         decodeCloneChromosome = do_2_Opt(decodeCloneChromosome, i, j);

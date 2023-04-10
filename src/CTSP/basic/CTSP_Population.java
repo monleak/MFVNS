@@ -19,7 +19,7 @@ public class CTSP_Population {
         while (pop.size() < Params.POP_SIZE){
             Individual individual = new Individual(prob.maxTotalVertices, prob.numberOfGraph,prob.numberOfVerticesPerCluster);
             for(int i=0;i<prob.numberOfGraph;i++){
-                individual.cost[i] = calCost(prob.graphs.get(i),individual.Chromosome,prob.numberOfVerticesPerCluster);
+                individual.cost[i] = calCost(prob.graphs.get(i),individual.Chromosome,prob.numberOfVerticesPerCluster,1);
             }
             pop.add(individual);
         }

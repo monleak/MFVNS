@@ -73,10 +73,13 @@ public class utilCTSP {
         for(int i=0;i<graph.numberOfCluster;i++){
             NOVPCinPrivateSpace[i] = graph.listCluster.get(i).listVertex.size();
         }
+        int[] decodeChromosome = null;
         if(type == 1){
-            int[] decodeChromosome = decodeChromosome(graph.totalVertices, Chromosome,NOVPCinCommonSpace,NOVPCinPrivateSpace);
+            decodeChromosome = decodeChromosome(graph.totalVertices, Chromosome,NOVPCinCommonSpace,NOVPCinPrivateSpace);
         }else if(type == 2){
-            int[] decodeChromosome = Chromosome.clone(); 
+            decodeChromosome = Chromosome.clone(); 
+        }else {
+            //TODO Trả về lỗi hoặc ngừng chương trình
         }
         
         //Tính độ dài đường đi trong các cluster

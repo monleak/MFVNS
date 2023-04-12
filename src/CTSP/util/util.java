@@ -4,6 +4,9 @@ import CTSP.basic.Params;
 import CTSP.benchmark.Graph;
 import CTSP.benchmark.Problem;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 public class util {
     /**
      * Tính khoảng cách giữa 2 điểm
@@ -77,15 +80,16 @@ public class util {
      */
     public static int[] convertOrder2(int[] array){
         int[] newArr = new int[array.length];
+        Arrays.fill(newArr,-1);
         for(int i=0;i<newArr.length;i++){
-            int max = 0;int idMax = -1;
+            int max = -1;int idMax = -1;
             for(int j=0;j<array.length;j++){
                 if(max < array[j]){
                     max = array[j];
                     idMax = j;
-                    array[j] = -1;
                 }
             }
+            array[idMax] = -1;
             newArr[i] = idMax;
         }
         return newArr;

@@ -35,9 +35,8 @@ public class utilCTSP {
             //Mã hóa từng cluster
             int pointDecode = pointPrivateSpace[i];
             int pointChromo = pointCommonSpace[i];
-            while (pointDecode<NOVPCinPrivateSpace[i]){
-                decodeChromosome[pointDecode] = Chromosome[pointChromo];
-                pointDecode++;pointChromo++;
+            for(int j=0;j<NOVPCinPrivateSpace[i];j++){
+                decodeChromosome[pointDecode++] = Chromosome[pointChromo++];
             }
         }
         return decodeChromosome;

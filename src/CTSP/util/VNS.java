@@ -100,7 +100,7 @@ public class VNS {
             NOVPCinPrivateSpace[i] = graph.listCluster.get(i).listVertex.size();
         }
         int[] cloneChromosome = indiv.Chromosome.clone();
-        int[] decodeCloneChromosome = decodeChromosome(cloneChromosome.length,cloneChromosome, indiv.NOVPCinCommonSpace, NOVPCinPrivateSpace);
+        int[] decodeCloneChromosome = decodeChromosome(graph.totalVertices,cloneChromosome, indiv.NOVPCinCommonSpace, NOVPCinPrivateSpace);
         decodeCloneChromosome = Shaking(decodeCloneChromosome);
         double curLength = calCost(graph,decodeCloneChromosome,NOVPCinPrivateSpace,2);
         //--------------swap-------------

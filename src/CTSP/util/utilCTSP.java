@@ -12,13 +12,13 @@ import static CTSP.util.util.convertOrder2;
 public class utilCTSP {
     /**
      * Giải mã cá thể từ không gian chung ra không gian riêng
-     * @param totalVertices Tổng số lượng đỉnh trong không gian riêng
+     * @param NOVinPrivateSpace Tổng số lượng đỉnh trong không gian riêng
      * @param Chromosome Gen ban đầu nằm trong không gian chung
      * @param NOVPCinCommonSpace Số lượng đỉnh từng cluster trong không gian chung
      * @param NOVPCinPrivateSpace Số lượng đỉnh từng cluster trong không gian riêng
      * @return NST sau khi giải mã
      */
-    public static int[] decodeChromosome(int totalVertices, int[] Chromosome,
+    public static int[] decodeChromosome(int NOVinPrivateSpace, int[] Chromosome,
                                          int[] NOVPCinCommonSpace,
                                          int[] NOVPCinPrivateSpace){
         int[] pointCommonSpace = new int[NOVPCinCommonSpace.length];
@@ -30,7 +30,7 @@ public class utilCTSP {
             pointPrivateSpace[i] = i == 0 ? 0 : (pointPrivateSpace[i-1]+NOVPCinPrivateSpace[i-1]);
         }
 
-        int[] decodeChromosome = new int[totalVertices];
+        int[] decodeChromosome = new int[NOVinPrivateSpace];
         for(int i=0;i<NOVPCinPrivateSpace.length;i++){
             //Mã hóa từng cluster
             int pointDecode = pointPrivateSpace[i];
@@ -102,7 +102,6 @@ public class utilCTSP {
         }else {
             //TODO Trả về lỗi hoặc ngừng chương trình
         }
-        
         //Tính độ dài đường đi trong các cluster
         double[] totalCostInCluster = new double[graph.numberOfCluster];
         int[] pointPrivateSpace = new int[NOVPCinPrivateSpace.length];

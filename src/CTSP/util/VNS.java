@@ -89,11 +89,11 @@ public class VNS {
      * @param indiv Cá thể ban đầu
      * @param type Loại localSearch lựa chọn (1 - swap, 2 - 2opt)
      * @param graph Đồ thị cần trùng với skillfactor của cá thể
+     * @param NOVPCinCommonSpace
      * @return boolean Có cải thiện sau khi search hay không (T/F)
      */
-    public static boolean localSearch(Individual indiv, int type, Graph graph){
+    public static boolean localSearch(Individual indiv, int type, Graph graph, int[] NOVPCinCommonSpace){
         boolean positive = false;
-
         //Shaking
         int[] NOVPCinPrivateSpace = new int[graph.numberOfCluster];
         for(int i=0;i<graph.numberOfCluster;i++){
@@ -129,16 +129,15 @@ public class VNS {
                     double lengthDelta = 0;
                     int[] path = do_2_Opt(decodeCloneChromosome.clone(),i,j);
                     lengthDelta = calCost(graph,path,indiv.NOVPCinCommonSpace,2) - curLength;
-
                     if (lengthDelta < 0) {
-                        decodeCloneChromosome = do_2_Opt(decodeCloneChromosome, i, j);
+                        decodeCloneChromosome = path;
                         curLength += lengthDelta;
                     }
                 }
             }
         }
         //--------------------2-opt----------------------
-        //TODO: encode
+        cloneChromosome = encodeChromosome(decodeCloneChromosome,cloneChromosome,NOVPCinCommonSpace,NOVPCinPrivateSpace);
         if(curLength < indiv.cost[indiv.skillfactor]){
             Arrays.fill(indiv.cost,Double.MAX_VALUE);
             indiv.cost[indiv.skillfactor] = curLength;

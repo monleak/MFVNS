@@ -2,6 +2,7 @@ package CTSP.util;
 
 import CTSP.basic.Params;
 import CTSP.benchmark.Graph;
+import CTSP.benchmark.Problem;
 
 public class util {
     /**
@@ -89,13 +90,13 @@ public class util {
         }
         return newArr;
     }
-//    public static int giveId(int x, int y, Problem prob){
-//        int p1,p2;
-//        p1 = Math.min(x,y);
-//        p2 = Math.max(x,y);
-//        if(p1==0){
-//            return p1+p2;
-//        }
-//        return giveId(p1-1,prob.graphs.size()-1,prob)+p2-p1+1;
-//    }
+    public static int giveId(int x, int y, Problem prob){
+        int p1,p2;
+        p1 = Math.min(x,y);
+        p2 = Math.max(x,y);
+        if(p1==0){
+            return p1+p2;
+        }
+        return giveId(p1-1,prob.graphs.size()-1,prob)+p2-p1+1;
+    }
 }

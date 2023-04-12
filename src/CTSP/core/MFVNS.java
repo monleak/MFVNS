@@ -8,7 +8,10 @@ import CTSP.benchmark.Problem;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static CTSP.util.MFEA.SBX;
+import static CTSP.util.VNS.localSearch;
 import static CTSP.util.util.*;
+import static CTSP.util.util.giveId;
 
 public class MFVNS {
     public CTSP_Population pop;
@@ -71,10 +74,9 @@ public class MFVNS {
 
                 while (cloneTypeLS.size() > 0 && !positive){
                     choose = Params.rand.nextInt(cloneTypeLS.size());
-                    positive = localSearch(pop.pop.get(i),cloneTypeLS.get(choose));
+                    positive = localSearch(pop.pop.get(i),cloneTypeLS.get(choose),prob.graphs.get(pop.pop.get(i).skillfactor),prob.numberOfVerticesPerCluster);
                     cloneTypeLS.remove(choose);
                 }
-//                localSearch(pop.pop.get(i),2);
             }
             //--------------------------------
             if(stop) break;
@@ -120,13 +122,13 @@ public class MFVNS {
             String temp = new String();
             System.out.print(count+" "+ Params.countEvals+": ");
             temp += count+" "+ Params.countEvals+": ";
-            for (int i=0;i<prob.testCase.get(testCase).length;i++) {
-                if((int)best[prob.testCase.get(testCase)[i]] <= prob.graphs.get(prob.testCase.get(testCase)[i]).optimal){
-                    System.out.print("*"+best[prob.testCase.get(testCase)[i]]+" ");
+            for (int i=0;i<prob.graphs.size();i++) {
+                if((int)best[i] <= prob.graphs.get(i).optimal){
+                    System.out.print("*"+best[i]+" ");
                 }else {
-                    System.out.print(best[prob.testCase.get(testCase)[i]]+" ");
+                    System.out.print(best[i]+" ");
                 }
-                temp += best[prob.testCase.get(testCase)[i]]+" ";
+                temp += best[i]+" ";
             }
             System.out.print("\n");
             temp+="\n";

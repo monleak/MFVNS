@@ -24,7 +24,7 @@ public class Graph {
         this.distance = new double[totalVertices][totalVertices];
         this.linkFile = linkFile;
         this.numberOfCluster = numberOfCluster;
-
+        this.optimal = -1;
         this.listCluster = new ArrayList<>();
         for(int i=0;i<numberOfCluster;i++){
             listCluster.add(new Cluster());
@@ -55,5 +55,8 @@ public class Graph {
             }
         });
 
+    }
+    public void setOptimal(int optimal){
+        this.optimal = optimal;
     }
 }

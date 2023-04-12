@@ -23,11 +23,11 @@ public class utilCTSP {
                                          int[] NOVPCinPrivateSpace){
         int[] pointCommonSpace = new int[NOVPCinCommonSpace.length];
         for(int i=0;i<pointCommonSpace.length;i++){
-            pointCommonSpace[i] = i == 0 ? 0 : (pointCommonSpace[i-1]+NOVPCinCommonSpace[i]);
+            pointCommonSpace[i] = i == 0 ? 0 : (pointCommonSpace[i-1]+NOVPCinCommonSpace[i-1]);
         }
         int[] pointPrivateSpace = new int[NOVPCinPrivateSpace.length];
         for(int i=0;i<pointPrivateSpace.length;i++){
-            pointPrivateSpace[i] = i == 0 ? 0 : (pointPrivateSpace[i-1]+NOVPCinPrivateSpace[i]);
+            pointPrivateSpace[i] = i == 0 ? 0 : (pointPrivateSpace[i-1]+NOVPCinPrivateSpace[i-1]);
         }
 
         int[] decodeChromosome = new int[totalVertices];
@@ -52,7 +52,29 @@ public class utilCTSP {
      * @return Gen sau khi được mã hóa
      */
     public static int[] encodeChromosome(int[] decodeChromosome, int[] oldChromosome, int[] NOVPCinCommonSpace, int[] NOVPCinPrivateSpace){
-        
+        int[] encodeChromosome = new int[oldChromosome.length];
+        int[] pointInCommonSpace = new int[NOVPCinCommonSpace.length];
+        for(int i=0;i<pointInCommonSpace.length;i++){
+            pointInCommonSpace[i] = i == 0 ? 0 : (pointInCommonSpace[i-1]+NOVPCinCommonSpace[i-1]);
+        }
+
+        int pointDecode =0, pointEncode = 0;
+        for(int i=0;i<NOVPCinCommonSpace.length;i++){
+            for(int j=0;j<NOVPCinCommonSpace[i];j++){
+                if(i<NOVPCinPrivateSpace.length){
+                    if(pointDecode<NOVPCinPrivateSpace[i]){
+                        encodeChromosome[pointEncode++] = decodeChromosome[pointDecode++];
+                    }else {
+                        encodeChromosome[pointEncode] = oldChromosome[pointEncode];
+                        pointEncode++;
+                    }
+                }else {
+                    encodeChromosome[pointEncode] = oldChromosome[pointEncode];
+                    pointEncode++;
+                }
+            }
+        }
+        return encodeChromosome;
     }
 
     /**
@@ -86,7 +108,7 @@ public class utilCTSP {
         double[] totalCostInCluster = new double[graph.numberOfCluster];
         int[] pointPrivateSpace = new int[NOVPCinPrivateSpace.length];
         for(int i=0;i<pointPrivateSpace.length;i++){
-            pointPrivateSpace[i] = i == 0 ? 0 : (pointPrivateSpace[i-1]+NOVPCinPrivateSpace[i]);
+            pointPrivateSpace[i] = i == 0 ? 0 : (pointPrivateSpace[i-1]+NOVPCinPrivateSpace[i-1]);
         }
         ArrayList<int[]> listClusterSegment = new ArrayList<>();
         for(int i=0;i<graph.numberOfCluster;i++){

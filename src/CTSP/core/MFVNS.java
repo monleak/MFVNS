@@ -75,7 +75,7 @@ public class MFVNS {
                 while (cloneTypeLS.size() > 0 && !positive){
                     choose = Params.rand.nextInt(cloneTypeLS.size());
                     //TODO: Code đa luồng khi local search
-                    positive = localSearch(pop.pop.get(i),cloneTypeLS.get(choose),prob.graphs.get(pop.pop.get(i).skillfactor),prob.numberOfVerticesPerCluster);
+                    positive = localSearch(pop.pop.get(i),cloneTypeLS.get(choose),prob.graphs.get(pop.pop.get(i).skillfactor),prob.NOVPCinCommonSpace, prob.pointCommonSpace);
                     cloneTypeLS.remove(choose);
                 }
             }

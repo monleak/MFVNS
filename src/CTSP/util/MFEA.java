@@ -17,8 +17,8 @@ public class MFEA {
     public static ArrayList<Individual> SBX(Individual parentA, Individual parentB){
         int maxTotalVertices = parentA.Chromosome.length;
         //Khởi tạo 2 cá thể con mới
-        Individual o1 = new Individual(maxTotalVertices, parentA.cost.length, parentA.NOVPCinCommonSpace);
-        Individual o2 = new Individual(maxTotalVertices, parentA.cost.length, parentA.NOVPCinCommonSpace);
+        Individual o1 = new Individual(maxTotalVertices, parentA.cost.length);
+        Individual o2 = new Individual(maxTotalVertices, parentA.cost.length);
 
         int[] ChromosomeA = parentA.Chromosome.clone();
         int[] ChromosomeB = parentB.Chromosome.clone();

@@ -19,13 +19,14 @@ public class Problem {
     public int numberOfGraph;
 
     /**
-     * numberOfVerticesPerCluster là số lượng đỉnh lớn nhất ở mỗi cluster. (Có thể được viết tắt là NOVPC)
+     * NOVPCinCommonSpace là số lượng đỉnh lớn nhất ở mỗi cluster. (Có thể được viết tắt là NOVPC)
      * Ví dụ:
      * Graph 1 có 4 cluster lần lượt là: C1 có 3 đỉnh, C2 có 5 đỉnh, C3 có 1 đỉnh, C4 có 2 đỉnh
      * Graph 2 có 3 cluster lần lượt là: C1 có 3 đỉnh, C2 có 2 đỉnh, C3 có 4 đỉnh
-     * Thì numberOfVerticesPerCluster[] = {3,5,4,2}
+     * Thì NOVPCinCommonSpace[] = {3,5,4,2}
      */
-    public int[] numberOfVerticesPerCluster;
+    public int[] NOVPCinCommonSpace;
+    public int[] pointCommonSpace;
     public int maxNumberOfCluster;
     public String instanceName; //Tên của folder chứa các file .clt
     public int maxTotalVertices;
@@ -43,16 +44,25 @@ public class Problem {
             }
         }
 
-        this.numberOfVerticesPerCluster = new int[maxNumberOfCluster];
+        this.NOVPCinCommonSpace = new int[maxNumberOfCluster];
         for(Graph g : graphs){
             for(int i = 0;i<g.numberOfCluster;i++){
-                if(numberOfVerticesPerCluster[i] < g.listCluster.get(i).listVertex.size()){
-                    numberOfVerticesPerCluster[i] = g.listCluster.get(i).listVertex.size();
+                if(NOVPCinCommonSpace[i] < g.listCluster.get(i).listVertex.size()){
+                    NOVPCinCommonSpace[i] = g.listCluster.get(i).listVertex.size();
                 }
             }
         }
+
+        this.pointCommonSpace = new int[this.maxNumberOfCluster];
+        for(int i=0;i<maxNumberOfCluster;i++){
+            if(i==0){
+                pointCommonSpace[i] = 0;
+            }else{
+                pointCommonSpace[i] = pointCommonSpace[i-1]+NOVPCinCommonSpace[i-1];
+            }
+        }
         this.maxTotalVertices =0;
-        for(int temp : numberOfVerticesPerCluster){
+        for(int temp : NOVPCinCommonSpace){
             this.maxTotalVertices+=temp;
         }
     }

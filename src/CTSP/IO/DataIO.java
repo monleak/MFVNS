@@ -119,6 +119,7 @@ public class DataIO {
         for (int i=0;i<graph.listCluster.size();i++){
             graph.listCluster.get(i).sortListVertex(); //Gán nhãn lại các đỉnh trong cluster theo khoảng cách đến O tăng dần
         }
+        graph.calPrivateSpace();
         System.out.println(" ✔️DONE");
         return graph;
     }

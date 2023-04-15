@@ -17,6 +17,8 @@ public class Graph {
     public String linkFile;
 
     public ArrayList<Cluster> listCluster; //Danh sách các cluster
+    public int[] NOVPCinPrivateSpace; //Số lượng đỉnh mỗi cluster
+    public int[] pointPrivateSpace; //Điểm bắt đầu mỗi cluster
 
     public Graph(int totalVertices,int numberOfCluster, String linkFile){
         this.totalVertices = totalVertices;
@@ -29,6 +31,8 @@ public class Graph {
         for(int i=0;i<numberOfCluster;i++){
             listCluster.add(new Cluster());
         }
+        this.NOVPCinPrivateSpace = new int[numberOfCluster];
+        this.pointPrivateSpace = new int[numberOfCluster];
     }
 
     public void addVertex(Vertex a){
@@ -58,5 +62,19 @@ public class Graph {
     }
     public void setOptimal(int optimal){
         this.optimal = optimal;
+    }
+
+    /**
+     * Tính NOVPCinPrivateSpace và pointPrivateSpace
+     */
+    public void calPrivateSpace(){
+        for(int i=0;i<this.numberOfCluster;i++){
+            this.NOVPCinPrivateSpace[i] = this.listCluster.get(i).listVertex.size();
+            if(i==0){
+                this.pointPrivateSpace[i] = 0;
+            }else {
+                this.pointPrivateSpace[i] = this.pointPrivateSpace[i-1]+this.NOVPCinPrivateSpace[i-1];
+            }
+        }
     }
 }

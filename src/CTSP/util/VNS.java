@@ -92,27 +92,23 @@ public class VNS {
      * @param NOVPCinCommonSpace
      * @return boolean Có cải thiện sau khi search hay không (T/F)
      */
-    public static boolean localSearch(Individual indiv, int type, Graph graph, int[] NOVPCinCommonSpace){
+    public static boolean localSearch(Individual indiv, int type, Graph graph, int[] NOVPCinCommonSpace, int[] pointCommonSpace){
         //TODO: Viết lại. Cấm swap tạo ra các infeasible
         boolean positive = false;
         //Shaking
-        int[] NOVPCinPrivateSpace = new int[graph.numberOfCluster];
-        for(int i=0;i<graph.numberOfCluster;i++){
-            NOVPCinPrivateSpace[i] = graph.listCluster.get(i).listVertex.size();
-        }
-        int[] cloneChromosome = indiv.Chromosome.clone();
-        int[] decodeCloneChromosome = decodeChromosome(graph.totalVertices,cloneChromosome, indiv.NOVPCinCommonSpace, NOVPCinPrivateSpace);
-        decodeCloneChromosome = Shaking(decodeCloneChromosome);
-        double curLength = calCost(graph,decodeCloneChromosome,NOVPCinPrivateSpace,2);
+        int[] NOVPCinPrivateSpace = graph.NOVPCinPrivateSpace;
+        int[] decodeChromosome = decodeChromosome(graph.totalVertices, indiv.Chromosome, pointCommonSpace,NOVPCinPrivateSpace, graph.pointPrivateSpace);
+        decodeChromosome = Shaking(decodeChromosome);
+        double curLength = calCost(graph,decodeChromosome,2,pointCommonSpace);
         //--------------swap-------------
         if(type == 1){
             double minDelta = 0;
             int min_i = -1;
-            int decodeLength = decodeCloneChromosome.length;
+            int decodeLength = decodeChromosome.length;
             for(int i=0;i< decodeLength;i++){
                 double deltaLength=0;
-                int[] path = swapPath(decodeCloneChromosome.clone(),i);
-                deltaLength = calCost(graph,path,NOVPCinPrivateSpace,2) - curLength;
+                int[] path = swapPath(decodeChromosome.clone(),i);
+                deltaLength = calCost(graph,path,2,pointCommonSpace) - curLength;
                 if(deltaLength < minDelta){
                     minDelta = deltaLength;
                     min_i = i;
@@ -120,31 +116,31 @@ public class VNS {
             }
             if(minDelta < 0){
                 curLength += minDelta;
-                decodeCloneChromosome = swapPath(decodeCloneChromosome,min_i);
+                decodeChromosome = swapPath(decodeChromosome,min_i);
             }
         }
             //-------------swap--------------
             //------------------2-opt---------------
         else if(type == 2){
-            int decodeLength = decodeCloneChromosome.length;
+            int decodeLength = decodeChromosome.length;
             for(int i=0; i < decodeLength - 1; i++) {
                 for(int j=i+1; j < decodeLength; j++) {
                     double lengthDelta = 0;
-                    int[] path = do_2_Opt(decodeCloneChromosome.clone(),i,j);
-                    lengthDelta = calCost(graph,path,indiv.NOVPCinCommonSpace,2) - curLength;
+                    int[] path = do_2_Opt(decodeChromosome.clone(),i,j);
+                    lengthDelta = calCost(graph,path,2,pointCommonSpace) - curLength;
                     if (lengthDelta < 0) {
-                        decodeCloneChromosome = path;
+                        decodeChromosome = path;
                         curLength += lengthDelta;
                     }
                 }
             }
         }
         //--------------------2-opt----------------------
-        cloneChromosome = encodeChromosome(decodeCloneChromosome,cloneChromosome,NOVPCinCommonSpace,NOVPCinPrivateSpace);
+        int[] tempChromosome = encodeChromosome(decodeChromosome, indiv.Chromosome, NOVPCinCommonSpace,NOVPCinPrivateSpace);
         if(curLength < indiv.cost[indiv.skillfactor]){
             Arrays.fill(indiv.cost,Double.MAX_VALUE);
             indiv.cost[indiv.skillfactor] = curLength;
-            indiv.Chromosome = cloneChromosome;
+            indiv.Chromosome = tempChromosome;
             positive = true;
         }
         return positive;

@@ -100,7 +100,7 @@ public class utilCTSP {
         }else if(type == 2){
             decodeChromosome = Chromosome.clone(); 
         }else {
-            //TODO Trả về lỗi hoặc ngừng chương trình
+            System.exit(9999);
         }
         //Tính độ dài đường đi trong các cluster
         double[] totalCostInCluster = new double[graph.numberOfCluster];

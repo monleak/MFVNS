@@ -93,6 +93,7 @@ public class VNS {
      * @return boolean Có cải thiện sau khi search hay không (T/F)
      */
     public static boolean localSearch(Individual indiv, int type, Graph graph, int[] NOVPCinCommonSpace){
+        //TODO: Viết lại. Cấm swap tạo ra các infeasible
         boolean positive = false;
         //Shaking
         int[] NOVPCinPrivateSpace = new int[graph.numberOfCluster];
@@ -107,7 +108,8 @@ public class VNS {
         if(type == 1){
             double minDelta = 0;
             int min_i = -1;
-            for(int i=0;i< decodeCloneChromosome.length;i++){
+            int decodeLength = decodeCloneChromosome.length;
+            for(int i=0;i< decodeLength;i++){
                 double deltaLength=0;
                 int[] path = swapPath(decodeCloneChromosome.clone(),i);
                 deltaLength = calCost(graph,path,NOVPCinPrivateSpace,2) - curLength;
@@ -115,7 +117,7 @@ public class VNS {
                     minDelta = deltaLength;
                     min_i = i;
                 }
-            } //TODO: check
+            }
             if(minDelta < 0){
                 curLength += minDelta;
                 decodeCloneChromosome = swapPath(decodeCloneChromosome,min_i);
@@ -124,8 +126,9 @@ public class VNS {
             //-------------swap--------------
             //------------------2-opt---------------
         else if(type == 2){
-            for(int i=0; i < decodeCloneChromosome.length - 1; i++) {
-                for(int j=i+1; j < decodeCloneChromosome.length; j++) {
+            int decodeLength = decodeCloneChromosome.length;
+            for(int i=0; i < decodeLength - 1; i++) {
+                for(int j=i+1; j < decodeLength; j++) {
                     double lengthDelta = 0;
                     int[] path = do_2_Opt(decodeCloneChromosome.clone(),i,j);
                     lengthDelta = calCost(graph,path,indiv.NOVPCinCommonSpace,2) - curLength;

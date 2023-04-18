@@ -32,7 +32,6 @@ public class Problem {
     public int maxTotalVertices;
 
     public Problem(String pathInstance){
-        //TODO: cần check
         graphs = new ArrayList<>();
         graphs.addAll(scanCTSPfile(pathInstance));
         this.instanceName = Paths.get(pathInstance).getFileName().toString();

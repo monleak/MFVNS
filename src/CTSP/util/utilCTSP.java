@@ -129,4 +129,33 @@ public class utilCTSP {
         Params.countEvals++;
         return cost;
     }
+
+    /**
+     * @param point Mảng chứa các điểm bắt đầu của các cluster
+     * @param i
+     * @return Trả về điểm i thuộc cluster bao nhiêu
+     */
+    public static int inCluster(int[] point,int i){
+        for(int p=0;p<point.length-1;p++){
+            if(point[p]<=i && point[p+1] > i)
+                return p;
+        }
+        return point.length-1;
+    }
+
+    /**
+     * Cắt đoạn cluster ra từ nhiễm sắc thể
+     * @param Chromosome
+     * @param pointStart
+     * @param numberOfVertex
+     * @return
+     */
+    public static int[] getClusterSegment(int[] Chromosome, int pointStart, int numberOfVertex){
+        int[] ClusterSegment = new int[numberOfVertex];
+        int j = 0;
+        for (int i=pointStart;i<numberOfVertex+pointStart;i++){
+            ClusterSegment[j++] = Chromosome[i];
+        }
+        return ClusterSegment;
+    }
 }

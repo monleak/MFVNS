@@ -3,6 +3,7 @@ package CTSP.basic;
 import CTSP.benchmark.Graph;
 import CTSP.util.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import static CTSP.util.util.randIntArray;

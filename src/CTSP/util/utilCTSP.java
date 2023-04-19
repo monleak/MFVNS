@@ -28,7 +28,7 @@ public class utilCTSP {
             //Mã hóa từng cluster
             int pointDecode = pointPrivateSpace[i];
             int pointChromo = pointCommonSpace[i];
-            for(int j=0;j<NOVPCinPrivateSpace[i];j++){
+            while(pointDecode<NOVPCinPrivateSpace[i]+pointPrivateSpace[i]){
                 decodeChromosome[pointDecode++] = Chromosome[pointChromo++];
             }
         }
@@ -43,18 +43,13 @@ public class utilCTSP {
      * @param NOVPCinPrivateSpace
      * @return Gen sau khi được mã hóa
      */
-    public static int[] encodeChromosome(int[] decodeChromosome, int[] oldChromosome, int[] NOVPCinCommonSpace, int[] NOVPCinPrivateSpace){
+    public static int[] encodeChromosome(int[] decodeChromosome, int[] oldChromosome, int[] NOVPCinCommonSpace, int[] NOVPCinPrivateSpace, int[] pointPrivateSpace){
         int[] encodeChromosome = new int[oldChromosome.length];
-        int[] pointInCommonSpace = new int[NOVPCinCommonSpace.length];
-        for(int i=0;i<pointInCommonSpace.length;i++){
-            pointInCommonSpace[i] = i == 0 ? 0 : (pointInCommonSpace[i-1]+NOVPCinCommonSpace[i-1]);
-        }
-
         int pointDecode =0, pointEncode = 0;
         for(int i=0;i<NOVPCinCommonSpace.length;i++){
             for(int j=0;j<NOVPCinCommonSpace[i];j++){
                 if(i<NOVPCinPrivateSpace.length){
-                    if(pointDecode<NOVPCinPrivateSpace[i]){
+                    if(pointDecode<NOVPCinPrivateSpace[i]+pointPrivateSpace[i]){
                         encodeChromosome[pointEncode++] = decodeChromosome[pointDecode++];
                     }else {
                         encodeChromosome[pointEncode] = oldChromosome[pointEncode];

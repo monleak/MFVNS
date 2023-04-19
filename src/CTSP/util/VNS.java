@@ -113,9 +113,10 @@ public class VNS {
             int min_i = -1;
             int decodeLength = decodeChromosome.length;
             for(int i=0;i< decodeLength;i++){
-                if(isExists(graph.pointPrivateSpace, i) || isExists(graph.pointPrivateSpace, i+1) || i == decodeLength-1){
-                    //Bỏ qua swap giữa các cluster và bỏ qua swap có thể làm thay đổi liên kết giữa các cluster
-                    //Nghĩa là: bỏ điểm đầu và điểm cuối
+                if(isExists(graph.pointPrivateSpace, i) || //bỏ điểm đầu cluster
+                   isExists(graph.pointPrivateSpace, i+1) || i == decodeLength-1 || //bỏ điểm cuối
+                   isExists(graph.pointPrivateSpace, i+2) || i == decodeLength-2 //bỏ sát điểm cuối
+                 ){
                     continue;
                 }
                 int inCluster = inCluster(graph.pointPrivateSpace, i);
@@ -169,7 +170,7 @@ public class VNS {
             }
         }
         //--------------------2-opt----------------------
-        int[] tempChromosome = encodeChromosome(decodeChromosome, indiv.Chromosome, NOVPCinCommonSpace,NOVPCinPrivateSpace);
+        int[] tempChromosome = encodeChromosome(decodeChromosome, indiv.Chromosome, NOVPCinCommonSpace,NOVPCinPrivateSpace,graph.pointPrivateSpace);
         if(curLength < indiv.cost[indiv.skillfactor]){
             Arrays.fill(indiv.cost,Double.MAX_VALUE);
             indiv.cost[indiv.skillfactor] = curLength;

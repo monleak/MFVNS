@@ -89,12 +89,12 @@ public class MFVNS {
                 }while (j==i);
 
                 if(pop.pop.get(i).skillfactor == pop.pop.get(j).skillfactor){
-                    ArrayList<Individual> child = SBX(pop.pop.get(i),pop.pop.get(j));
+                    ArrayList<Individual> child = SBX(pop.pop.get(i),pop.pop.get(j),prob);
                     pop.pop.addAll(child);
                 }else {
                     double currentRmp = rmp[giveId(pop.pop.get(i).skillfactor,pop.pop.get(j).skillfactor,prob)];
                     if(Params.rand.nextDouble() < currentRmp){
-                        ArrayList<Individual> child = SBX(pop.pop.get(i),pop.pop.get(j));
+                        ArrayList<Individual> child = SBX(pop.pop.get(i),pop.pop.get(j),prob);
                         for(int o=0;o<child.size();o++){
                             double delta;
 

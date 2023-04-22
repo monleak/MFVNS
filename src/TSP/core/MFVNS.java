@@ -372,6 +372,7 @@ public class MFVNS {
         //-------------swap--------------
         //------------------2-opt---------------
         if(type == 2){
+            //TODO: kiem tra lai i,j
             for(int i=0; i < path.length - 1; i++) {
                 for(int j=i+1; j < path.length; j++) {
                     double lengthDelta;

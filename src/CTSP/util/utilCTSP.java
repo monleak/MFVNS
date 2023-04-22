@@ -28,7 +28,7 @@ public class utilCTSP {
             //Mã hóa từng cluster
             int pointDecode = pointPrivateSpace[i];
             int pointChromo = pointCommonSpace[i];
-            for(int j=0;j<NOVPCinPrivateSpace[i];j++){
+            while(pointDecode<NOVPCinPrivateSpace[i]+pointPrivateSpace[i]){
                 decodeChromosome[pointDecode++] = Chromosome[pointChromo++];
             }
         }
@@ -43,18 +43,13 @@ public class utilCTSP {
      * @param NOVPCinPrivateSpace
      * @return Gen sau khi được mã hóa
      */
-    public static int[] encodeChromosome(int[] decodeChromosome, int[] oldChromosome, int[] NOVPCinCommonSpace, int[] NOVPCinPrivateSpace){
+    public static int[] encodeChromosome(int[] decodeChromosome, int[] oldChromosome, int[] NOVPCinCommonSpace, int[] NOVPCinPrivateSpace, int[] pointPrivateSpace){
         int[] encodeChromosome = new int[oldChromosome.length];
-        int[] pointInCommonSpace = new int[NOVPCinCommonSpace.length];
-        for(int i=0;i<pointInCommonSpace.length;i++){
-            pointInCommonSpace[i] = i == 0 ? 0 : (pointInCommonSpace[i-1]+NOVPCinCommonSpace[i-1]);
-        }
-
         int pointDecode =0, pointEncode = 0;
         for(int i=0;i<NOVPCinCommonSpace.length;i++){
             for(int j=0;j<NOVPCinCommonSpace[i];j++){
                 if(i<NOVPCinPrivateSpace.length){
-                    if(pointDecode<NOVPCinPrivateSpace[i]){
+                    if(pointDecode<NOVPCinPrivateSpace[i]+pointPrivateSpace[i]){
                         encodeChromosome[pointEncode++] = decodeChromosome[pointDecode++];
                     }else {
                         encodeChromosome[pointEncode] = oldChromosome[pointEncode];
@@ -97,20 +92,17 @@ public class utilCTSP {
         int[] pointPrivateSpace = graph.pointPrivateSpace;
         ArrayList<int[]> listClusterSegment = new ArrayList<>();
         for(int i=0;i<graph.numberOfCluster;i++){
-            int[] clusterSegment = new int[NOVPCinPrivateSpace[i]];
-            for(int j=0;j<clusterSegment.length;j++){
-                clusterSegment[j] = decodeChromosome[j+pointPrivateSpace[i]];
-            }
-            ClusterOrder[i] = Arrays.stream(clusterSegment).sum()/clusterSegment.length;
-            clusterSegment = convertOrder(clusterSegment,0);
-            listClusterSegment.add(clusterSegment);
-            for(int j=0;j<clusterSegment.length-1;j++){
-                totalCostInCluster[i] += graph.distance[graph.listCluster.get(i).listVertex.get(j).id-1][graph.listCluster.get(i).listVertex.get(j+1).id-1];
+            int[] ClusterSegment = getClusterSegment(decodeChromosome,pointPrivateSpace[i],NOVPCinPrivateSpace[i]);
+            ClusterOrder[i] = Arrays.stream(ClusterOrder).sum()/ClusterSegment.length;
+            ClusterSegment = convertOrder(ClusterSegment,0);
+            listClusterSegment.add(ClusterSegment);
+            for(int j=0;j<ClusterSegment.length-1;j++){
+                totalCostInCluster[i] += graph.distance[graph.listCluster.get(i).listVertex.get(ClusterSegment[j]).id-1]
+                                                       [graph.listCluster.get(i).listVertex.get(ClusterSegment[j+1]).id-1];
             }
         }
-        //Thứ tự di chuyển giữa các cluster được sắp xếp dựa trên trung bình cộng clusterSegment
         ClusterOrder = convertOrder2(ClusterOrder);
-        //Tổng giá trị đường đi = tổng độ dài đường đi trong cluster + tổng độ dài đoạn nối các cluster
+
         //Tính tổng độ dài các đoạn nối
         double totalCostLink = 0;
         for(int i=0;i<graph.numberOfCluster-1;i++){
@@ -122,11 +114,41 @@ public class utilCTSP {
                 [graph.listCluster.get(ClusterOrder[graph.numberOfCluster-1]).listVertex.get(listClusterSegment.get(ClusterOrder[graph.numberOfCluster-1])[listClusterSegment.get(ClusterOrder[graph.numberOfCluster-1]).length-1]).id-1]
                 [graph.listCluster.get(ClusterOrder[0]).listVertex.get(listClusterSegment.get(ClusterOrder[0])[listClusterSegment.get(ClusterOrder[0]).length-1]).id-1];
 
+        //Tổng giá trị đường đi = tổng độ dài đường đi trong cluster + tổng độ dài đoạn nối các cluster
         for(double temp : totalCostInCluster){
             cost+=temp;
         }
         cost+=totalCostLink;
         Params.countEvals++;
         return cost;
+    }
+
+    /**
+     * @param point Mảng chứa các điểm bắt đầu của các cluster
+     * @param i
+     * @return Trả về điểm i thuộc cluster bao nhiêu
+     */
+    public static int inCluster(int[] point,int i){
+        for(int p=0;p<point.length-1;p++){
+            if(point[p]<=i && point[p+1] > i)
+                return p;
+        }
+        return point.length-1;
+    }
+
+    /**
+     * Cắt đoạn cluster ra từ nhiễm sắc thể
+     * @param Chromosome
+     * @param pointStart
+     * @param numberOfVertex
+     * @return
+     */
+    public static int[] getClusterSegment(int[] Chromosome, int pointStart, int numberOfVertex){
+        int[] ClusterSegment = new int[numberOfVertex];
+        int j = 0;
+        for (int i=pointStart;i<numberOfVertex+pointStart;i++){
+            ClusterSegment[j++] = Chromosome[i];
+        }
+        return ClusterSegment;
     }
 }

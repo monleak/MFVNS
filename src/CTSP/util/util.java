@@ -103,4 +103,19 @@ public class util {
         }
         return giveId(p1-1,prob.graphs.size()-1,prob)+p2-p1+1;
     }
+
+    /**
+     * Kiểm tra xem n có tồn tại trong mảng arr hay không
+     * @param arr
+     * @param n
+     * @return
+     */
+    public static boolean isExists(int[] arr, int n){
+        for(int i : arr){
+            if(i==n){
+                return true;
+            }
+        }
+        return false;
+    }
 }

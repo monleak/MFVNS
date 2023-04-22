@@ -4,8 +4,10 @@ import CTSP.basic.Individual;
 import CTSP.basic.Params;
 import CTSP.benchmark.Graph;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
+import static CTSP.util.util.*;
 import static CTSP.util.utilCTSP.*;
 
 public class VNS {
@@ -106,9 +108,25 @@ public class VNS {
             int min_i = -1;
             int decodeLength = decodeChromosome.length;
             for(int i=0;i< decodeLength;i++){
-                double deltaLength=0;
-                int[] path = swapPath(decodeChromosome.clone(),i);
-                deltaLength = calCost(graph,path,2,pointCommonSpace) - curLength;
+                if(isExists(graph.pointPrivateSpace, i) || //bỏ điểm đầu cluster
+                   isExists(graph.pointPrivateSpace, i+1) || i == decodeLength-1 || //bỏ điểm cuối
+                   isExists(graph.pointPrivateSpace, i+2) || i == decodeLength-2 //bỏ sát điểm cuối
+                 ){
+                    continue;
+                }
+                int inCluster = inCluster(graph.pointPrivateSpace, i);
+                int[] ClusterSegment = getClusterSegment(decodeChromosome,graph.pointPrivateSpace[inCluster],NOVPCinPrivateSpace[inCluster]);
+                ClusterSegment = convertOrder(ClusterSegment,0);
+                //TODO: tính deltaLength
+                double deltaLength = - graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i-graph.pointPrivateSpace[inCluster]]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i-1-graph.pointPrivateSpace[inCluster]]).id-1]
+                                     - graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i+1-graph.pointPrivateSpace[inCluster]]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i+2-graph.pointPrivateSpace[inCluster]]).id-1]
+                                     + graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i-1-graph.pointPrivateSpace[inCluster]]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i+1-graph.pointPrivateSpace[inCluster]]).id-1]
+                                     + graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i-graph.pointPrivateSpace[inCluster]]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i+2-graph.pointPrivateSpace[inCluster]]).id-1];
+
+//                double deltaLength=0;
+//                int[] path = swapPath(decodeChromosome.clone(),i);
+//                deltaLength = calCost(graph,path,2,pointCommonSpace) - curLength;
+
                 if(deltaLength < minDelta){
                     minDelta = deltaLength;
                     min_i = i;
@@ -122,25 +140,29 @@ public class VNS {
             //-------------swap--------------
             //------------------2-opt---------------
         else if(type == 2){
-            int decodeLength = decodeChromosome.length;
-            for(int i=0; i < decodeLength - 1; i++) {
-                for(int j=i+1; j < decodeLength; j++) {
-                    double lengthDelta = 0;
-                    int[] path = do_2_Opt(decodeChromosome.clone(),i,j);
-                    lengthDelta = calCost(graph,path,2,pointCommonSpace) - curLength;
-                    if (lengthDelta < 0) {
-                        decodeChromosome = path;
-                        curLength += lengthDelta;
+            for(int inCluster = 0;inCluster < NOVPCinPrivateSpace.length;inCluster++){
+                int[] ClusterSegment = getClusterSegment(decodeChromosome,graph.pointPrivateSpace[inCluster],NOVPCinPrivateSpace[inCluster]);
+                ClusterSegment = convertOrder(ClusterSegment,0);
+                for(int i=0;i<NOVPCinPrivateSpace[inCluster]-3;i++){
+                    for(int j=i+2;j<NOVPCinPrivateSpace[inCluster]-1;j++){
+                        double lengthDelta = - graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i+1]).id-1]
+                                         - graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[j]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[j+1]).id-1]
+                                         + graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i+1]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[j+1]).id-1]
+                                         + graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[j]).id-1];
+                        if(lengthDelta < 0){
+                            ClusterSegment = do_2_Opt(ClusterSegment,i,j);
+                            decodeChromosome = do_2_Opt(decodeChromosome,i+graph.pointPrivateSpace[inCluster],j+graph.pointPrivateSpace[inCluster]);
+                            curLength += lengthDelta;
+                        }
                     }
                 }
             }
         }
         //--------------------2-opt----------------------
-        int[] tempChromosome = encodeChromosome(decodeChromosome, indiv.Chromosome, NOVPCinCommonSpace,NOVPCinPrivateSpace);
         if(curLength < indiv.cost[indiv.skillfactor]){
             Arrays.fill(indiv.cost,Double.MAX_VALUE);
             indiv.cost[indiv.skillfactor] = curLength;
-            indiv.Chromosome = tempChromosome;
+            indiv.Chromosome = encodeChromosome(decodeChromosome, indiv.Chromosome, NOVPCinCommonSpace,NOVPCinPrivateSpace,graph.pointPrivateSpace);;
             positive = true;
         }
         return positive;

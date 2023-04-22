@@ -140,29 +140,6 @@ public class VNS {
             //-------------swap--------------
             //------------------2-opt---------------
         else if(type == 2){
-//            int decodeLength = decodeChromosome.length;
-//            for(int i=0; i < decodeLength - 1; i++) {
-//                int inCluster = inCluster(graph.pointPrivateSpace, i);
-//                int[] ClusterSegment = getClusterSegment(decodeChromosome,graph.pointPrivateSpace[inCluster],NOVPCinPrivateSpace[inCluster]);
-//                ClusterSegment = convertOrder(ClusterSegment,0);
-//                for(int j=i+2; j < graph.pointPrivateSpace[inCluster]+graph.NOVPCinPrivateSpace[inCluster]-1; j++) {
-//                    double lengthDelta = - graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i-graph.pointPrivateSpace[inCluster]]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i+1-graph.pointPrivateSpace[inCluster]]).id-1]
-//                                         - graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[j-graph.pointPrivateSpace[inCluster]]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[j+1-graph.pointPrivateSpace[inCluster]]).id-1]
-//                                         + graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i+1-graph.pointPrivateSpace[inCluster]]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[j+1-graph.pointPrivateSpace[inCluster]]).id-1]
-//                                         + graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i-graph.pointPrivateSpace[inCluster]]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[j-graph.pointPrivateSpace[inCluster]]).id-1];
-////                    double lengthDelta = 0;
-////                    int[] path = do_2_Opt(decodeChromosome.clone(),i,j);
-////                    lengthDelta = calCost(graph,path,2,pointCommonSpace) - curLength;
-//
-//                    //TODO: ClusterSegment cần tính toán lại
-//                    if (lengthDelta < 0) {
-//                        decodeChromosome = do_2_Opt(decodeChromosome,i,j);
-//                        curLength += lengthDelta;
-//                        ClusterSegment = getClusterSegment(decodeChromosome,graph.pointPrivateSpace[inCluster],NOVPCinPrivateSpace[inCluster]);
-//                        ClusterSegment = convertOrder(ClusterSegment,0);
-//                    }
-//                }
-//            }
             for(int inCluster = 0;inCluster < NOVPCinPrivateSpace.length;inCluster++){
                 int[] ClusterSegment = getClusterSegment(decodeChromosome,graph.pointPrivateSpace[inCluster],NOVPCinPrivateSpace[inCluster]);
                 ClusterSegment = convertOrder(ClusterSegment,0);

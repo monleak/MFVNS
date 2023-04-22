@@ -92,20 +92,17 @@ public class utilCTSP {
         int[] pointPrivateSpace = graph.pointPrivateSpace;
         ArrayList<int[]> listClusterSegment = new ArrayList<>();
         for(int i=0;i<graph.numberOfCluster;i++){
-            int[] clusterSegment = new int[NOVPCinPrivateSpace[i]];
-            for(int j=0;j<clusterSegment.length;j++){
-                clusterSegment[j] = decodeChromosome[j+pointPrivateSpace[i]];
-            }
-            ClusterOrder[i] = Arrays.stream(clusterSegment).sum()/clusterSegment.length;
-            clusterSegment = convertOrder(clusterSegment,0);
-            listClusterSegment.add(clusterSegment);
-            for(int j=0;j<clusterSegment.length-1;j++){
-                totalCostInCluster[i] += graph.distance[graph.listCluster.get(i).listVertex.get(j).id-1][graph.listCluster.get(i).listVertex.get(j+1).id-1];
+            int[] ClusterSegment = getClusterSegment(decodeChromosome,pointPrivateSpace[i],NOVPCinPrivateSpace[i]);
+            ClusterOrder[i] = Arrays.stream(ClusterOrder).sum()/ClusterSegment.length;
+            ClusterSegment = convertOrder(ClusterSegment,0);
+            listClusterSegment.add(ClusterSegment);
+            for(int j=0;j<ClusterSegment.length-1;j++){
+                totalCostInCluster[i] += graph.distance[graph.listCluster.get(i).listVertex.get(ClusterSegment[j]).id-1]
+                                                       [graph.listCluster.get(i).listVertex.get(ClusterSegment[j+1]).id-1];
             }
         }
-        //Thứ tự di chuyển giữa các cluster được sắp xếp dựa trên trung bình cộng clusterSegment
         ClusterOrder = convertOrder2(ClusterOrder);
-        //Tổng giá trị đường đi = tổng độ dài đường đi trong cluster + tổng độ dài đoạn nối các cluster
+
         //Tính tổng độ dài các đoạn nối
         double totalCostLink = 0;
         for(int i=0;i<graph.numberOfCluster-1;i++){
@@ -117,6 +114,7 @@ public class utilCTSP {
                 [graph.listCluster.get(ClusterOrder[graph.numberOfCluster-1]).listVertex.get(listClusterSegment.get(ClusterOrder[graph.numberOfCluster-1])[listClusterSegment.get(ClusterOrder[graph.numberOfCluster-1]).length-1]).id-1]
                 [graph.listCluster.get(ClusterOrder[0]).listVertex.get(listClusterSegment.get(ClusterOrder[0])[listClusterSegment.get(ClusterOrder[0]).length-1]).id-1];
 
+        //Tổng giá trị đường đi = tổng độ dài đường đi trong cluster + tổng độ dài đoạn nối các cluster
         for(double temp : totalCostInCluster){
             cost+=temp;
         }

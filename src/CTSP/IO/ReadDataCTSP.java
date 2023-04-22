@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import static CTSP.IO.DataIO.readDataCTSP;
 
 public class ReadDataCTSP {
-    public static ArrayList<Graph> scanCTSPfile(String path){
+    public static ArrayList<Graph> scanCTSPfile(String path, ArrayList<String> orderTask){
         ArrayList<Graph> graphs = new ArrayList<>();
         File file = new File(path);
         File[] files = file.listFiles();
@@ -17,10 +17,9 @@ public class ReadDataCTSP {
             return graphs;
 
         for (File f : files) {
-
             if (f.isDirectory() && f.exists()) {
                 try {
-                    graphs.addAll(scanCTSPfile(f.getPath()));
+                    graphs.addAll(scanCTSPfile(f.getPath(),orderTask));
                 }
                 catch (Exception e) {
                     e.printStackTrace();
@@ -31,7 +30,7 @@ public class ReadDataCTSP {
                 // using file filter
                 if (filter.accept(f)) {
 //                    System.out.println(f.getPath());
-                    graphs.add(readDataCTSP(f.getPath()));
+                    graphs.add(readDataCTSP(f.getPath(),orderTask));
                 }
             }
         }

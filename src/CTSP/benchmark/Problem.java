@@ -31,9 +31,9 @@ public class Problem {
     public String instanceName; //Tên của folder chứa các file .clt
     public int maxTotalVertices;
 
-    public Problem(String pathInstance){
+    public Problem(String pathInstance,ArrayList<String> orderTask){
         graphs = new ArrayList<>();
-        graphs.addAll(scanCTSPfile(pathInstance));
+        graphs.addAll(scanCTSPfile(pathInstance,orderTask));
         this.instanceName = Paths.get(pathInstance).getFileName().toString();
         this.numberOfGraph = graphs.size();
 

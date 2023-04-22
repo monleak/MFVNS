@@ -5,13 +5,14 @@ import CTSP.benchmark.Vertex;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.Objects;
 
 enum typeGraph {
     EUCLIDEAN,NONEUCLIDEAN,NOTYPE;
 }
 public class DataIO {
-    public static Graph readDataCTSP(String linkFile) {
+    public static Graph readDataCTSP(String linkFile, ArrayList<String> orderTask) {
         String startMess = "Reading data from "+linkFile;
         System.out.print(startMess);
         Graph graph = null;
@@ -113,6 +114,7 @@ public class DataIO {
             readBuffer.close();
         }catch(Exception e){
             System.out.println(" ❌FAIL");
+            orderTask.add(startMess+" ❌FAIL\n");
             return graph;
         }
         graph.sortListCluster(); //Gán nhãn lại các cluster theo số lượng đỉnh tăng dần
@@ -121,6 +123,7 @@ public class DataIO {
         }
         graph.calPrivateSpace();
         System.out.println(" ✔️DONE");
+        orderTask.add(startMess+" ✔️DONE\n");
         return graph;
     }
     public static double calDis(int x1,int y1,int x2,int y2){

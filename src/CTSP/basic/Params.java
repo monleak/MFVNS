@@ -3,9 +3,13 @@ package CTSP.basic;
 import java.util.Random;
 
 public class Params {
+    public static int type = 2; // 1-Large  2-Small
+    public static String linkProb = "Data/b4gcgybvt6-4/Euclidean instances/Small Instances/Type_1_Small";
     public static String linkData = "Data//";
     public static String linkOutput = "Result//";
     public static String linkOutputCTSP = "CTSP//";
+    public static String linkLarge = "Large//";
+    public static String linkSmall = "Small//";
     public static int POP_SIZE= 200;
     public static int kmax = 4;
     public static Random rand; //Được khởi tạo theo các seed

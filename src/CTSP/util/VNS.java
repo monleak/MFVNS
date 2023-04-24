@@ -176,7 +176,6 @@ public class VNS {
             indiv.Chromosome = encodeChromosome(decodeChromosome, indiv.Chromosome, NOVPCinCommonSpace,NOVPCinPrivateSpace,graph.pointPrivateSpace);;
             positive = true;
         }
-        System.out.println("1 lan localsearch");
         return positive;
     }
     /**

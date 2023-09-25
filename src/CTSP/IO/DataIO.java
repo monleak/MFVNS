@@ -19,10 +19,10 @@ public class DataIO {
 
         //Khởi tạo cấu trúc dữ liệu và lưu nó trong mảng 2 chiều
         BufferedReader readBuffer = null;
+        typeGraph type = typeGraph.NOTYPE;
         try{
             readBuffer = new BufferedReader(new FileReader(linkFile));
             String line;
-            typeGraph type = typeGraph.NOTYPE;
             int totalVertices = 0;
             int numberOfCluster = 0;
             do{
@@ -73,24 +73,23 @@ public class DataIO {
                     }
                 }
             } else if(type == typeGraph.NONEUCLIDEAN){
-                throw new Exception("\nHiện tại chưa hỗ trợ các bộ dữ liệu NONEUCLIDEAN");
-//                for(int i=0;i< graph.totalVertices;i++){
-//                    Vertex vertex = new Vertex(i+1);
-//                    graph.addVertex(vertex);
-//                }
-//                int count = 0;
-//                do{
-//                    line = readBuffer.readLine();
-//                    if(line.contains("CLUSTER_SECTION")){//Dấu hiệu bắt đầu của phần dữ liệu cụm
-//                        break;
-//                    }
-//                    String[] result = line.split("\t");
-//
-//                    for (int j=0;j<graph.totalVertices;j++){
-//                        graph.distance[count][j] = Integer.parseInt(result[j].trim());
-//                    }
-//                    count++;
-//                }while (true);
+                for(int i=0;i< graph.totalVertices;i++){
+                    Vertex vertex = new Vertex(i+1,0,0);
+                    graph.addVertex(vertex);
+                }
+                int count = 0;
+                do{
+                    line = readBuffer.readLine();
+                    if(line.contains("CLUSTER_SECTION")){//Dấu hiệu bắt đầu của phần dữ liệu cụm
+                        break;
+                    }
+                    String[] result = line.split("\t");
+
+                    for (int j=0;j<graph.totalVertices;j++){
+                        graph.distance[count][j] = Integer.parseInt(result[j].trim());
+                    }
+                    count++;
+                }while (true);
             }
 
             line = readBuffer.readLine();
@@ -118,8 +117,10 @@ public class DataIO {
             return graph;
         }
         graph.sortListCluster(); //Gán nhãn lại các cluster theo số lượng đỉnh tăng dần
-        for (int i=0;i<graph.listCluster.size();i++){
-            graph.listCluster.get(i).sortListVertex(); //Gán nhãn lại các đỉnh trong cluster theo khoảng cách đến O tăng dần
+        if(type == typeGraph.EUCLIDEAN){
+            for (int i=0;i<graph.listCluster.size();i++){
+                graph.listCluster.get(i).sortListVertex(); //Gán nhãn lại các đỉnh trong cluster theo khoảng cách đến O tăng dần
+            }
         }
         graph.calPrivateSpace();
         System.out.println(" ✔️DONE");

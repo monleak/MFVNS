@@ -57,6 +57,7 @@ public class Main {
         orderTask.clear();
         outOrderTask.close();
 
+        //Hoạt động chính
         for (int seed = 0; seed < Params.REPT; seed++){
             ArrayList<String> result = new ArrayList<>();
             System.out.println("=============== " + newProb.instanceName +" Seed "+ seed +" =================");

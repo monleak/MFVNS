@@ -30,7 +30,13 @@ public class ReadDataCTSP {
                 // using file filter
                 if (filter.accept(f)) {
 //                    System.out.println(f.getPath());
-                    graphs.add(readDataCTSP(f.getPath(),orderTask));
+                    typeFile type = null;
+                    if(f.getName().endsWith(".clt")){
+                        type = typeFile.CLT;
+                    }else if(f.getName().endsWith(".htsp")){
+                        type = typeFile.HTSP;
+                    }
+                    graphs.add(readDataCTSP(f.getPath(),orderTask,type));
                 }
             }
         }
@@ -42,10 +48,7 @@ public class ReadDataCTSP {
         @Override
         public boolean accept(File file)
         {
-            if (file.getName().endsWith(".clt")) {
-                return true;
-            }
-            return false;
+            return file.getName().endsWith(".clt") || file.getName().endsWith(".htsp");
         }
     };
 }

@@ -94,7 +94,7 @@ public class utilCTSP {
         for(int i=0;i<graph.numberOfCluster;i++){
             int[] ClusterSegment = getClusterSegment(decodeChromosome,pointPrivateSpace[i],NOVPCinPrivateSpace[i]);
             //TODO: kiểm tra lại ClusterOrder
-            ClusterOrder[i] = Arrays.stream(ClusterOrder).sum()/ClusterSegment.length;
+            ClusterOrder[i] = Arrays.stream(ClusterSegment).sum()/ClusterSegment.length;
             ClusterSegment = convertOrder(ClusterSegment,0);
             listClusterSegment.add(ClusterSegment);
             for(int j=0;j<ClusterSegment.length-1;j++){

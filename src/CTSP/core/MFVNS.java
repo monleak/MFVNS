@@ -69,10 +69,9 @@ public class MFVNS {
                 int choose; //Lựa chọn loại localSearch
                 boolean positive = false; //Local seach có hiệu quả hay không ?
 
-                ArrayList<Integer> cloneTypeLS = new ArrayList<>();
-                cloneTypeLS.addAll(typeLocalSearch);
+                ArrayList<Integer> cloneTypeLS = new ArrayList<>(typeLocalSearch);
 
-                while (cloneTypeLS.size() > 0 && !positive){
+                while (!cloneTypeLS.isEmpty() && !positive){
                     choose = Params.rand.nextInt(cloneTypeLS.size());
                     //TODO: Code đa luồng khi local search
                     positive = localSearch(pop.pop.get(i),cloneTypeLS.get(choose),prob.graphs.get(pop.pop.get(i).skillfactor),prob.NOVPCinCommonSpace, prob.pointCommonSpace);

@@ -15,7 +15,6 @@ import static CTSP.util.util.giveId;
 
 public class MFVNS {
     public CTSP_Population pop;
-    public double[] best;
     public Problem prob;
     public double rmp[]; //Bộ nhớ lịch sử thành công rmp
 
@@ -28,8 +27,6 @@ public class MFVNS {
 
     public MFVNS(Problem prob){
         this.prob = prob;
-        best = new double[prob.graphs.size()];
-        Arrays.fill(best,Double.MAX_VALUE);
 
         pop = new CTSP_Population(prob);
 
@@ -43,7 +40,6 @@ public class MFVNS {
         }
 
         update();
-
     }
 
     /**
@@ -60,8 +56,8 @@ public class MFVNS {
             for(int i=1;i<=2;i++){  //Hiện tại đang có 2 toán tử local search
                 typeLocalSearch.add(i);
             }
-            for(int i=0;i<pop.pop.size();i++){
-                if((int)best[pop.pop.get(i).skillfactor] <= prob.graphs.get(pop.pop.get(i).skillfactor).optimal){
+            for(int i=0;i<pop.prob.numberOfGraph;i++){ //Mỗi đồ thị tạo 1 cá thể local search mới
+                if((int)pop.best[i] <= prob.graphs.get(i).optimal){
                     continue;
                 }
                 stop = false;
@@ -73,7 +69,6 @@ public class MFVNS {
 
                 while (!cloneTypeLS.isEmpty() && !positive){
                     choose = Params.rand.nextInt(cloneTypeLS.size());
-                    //TODO: Code đa luồng khi local search
                     positive = localSearch(pop.pop.get(i),cloneTypeLS.get(choose),prob.graphs.get(pop.pop.get(i).skillfactor),prob.NOVPCinCommonSpace, prob.pointCommonSpace);
                     cloneTypeLS.remove(choose);
                 }
@@ -123,12 +118,12 @@ public class MFVNS {
             System.out.print(count+" "+ Params.countEvals+": ");
             temp += count+" "+ Params.countEvals+": ";
             for (int i=0;i<prob.graphs.size();i++) {
-                if((int)best[i] <= prob.graphs.get(i).optimal){
-                    System.out.print("*"+best[i]+" ");
+                if((int)pop.best[i] <= prob.graphs.get(i).optimal){
+                    System.out.print("*"+pop.best[i]+" ");
                 }else {
-                    System.out.print(best[i]+" ");
+                    System.out.print(pop.best[i]+" ");
                 }
-                temp += best[i]+" ";
+                temp += pop.best[i]+" ";
             }
             System.out.print("\n");
             temp+="\n";
@@ -146,12 +141,25 @@ public class MFVNS {
     }
 
     /**
+     * Phase local search
+     * @param typeLocalSearch Danh sách type local search
+     */
+    private void LocalSearch_Phase(ArrayList<Integer> typeLocalSearch){
+        int choose; //Lựa chọn loại localSearch
+        boolean positive = false; //Local seach có hiệu quả hay không ?
+
+        while (!typeLocalSearch.isEmpty() && !positive){
+            choose = Params.rand.nextInt(typeLocalSearch.size());
+            positive = localSearch(pop.pop.get(i),typeLocalSearch.get(choose),prob.graphs.get(pop.pop.get(i).skillfactor),prob.NOVPCinCommonSpace, prob.pointCommonSpace);
+            typeLocalSearch.remove(choose);
+        }
+    }
+
+    /**
      * Update quần thể khi qua thế hệ mới
      */
     public void update(){
         pop.update();
-        this.best = pop.best.clone();
-
         // update RMP
         double maxRmp = 0;
         for (int i = 0; i < rmp.length; i++) {

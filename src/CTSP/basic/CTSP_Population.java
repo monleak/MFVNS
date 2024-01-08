@@ -16,18 +16,8 @@ public class CTSP_Population {
     public CTSP_Population(Problem prob){
         this.prob = prob;
         pop = new ArrayList<>();
-        while (pop.size() < Params.POP_SIZE){
-            Individual individual = new Individual(prob.maxTotalVertices, prob.numberOfGraph);
-            for(int i=0;i<prob.numberOfGraph;i++){
-                individual.cost[i] = calCost(prob.graphs.get(i),individual.Chromosome,1, prob.pointCommonSpace);
-            }
-            pop.add(individual);
-        }
-
         this.best = new double[prob.graphs.size()];
         Arrays.fill(best,Double.MAX_VALUE);
-
-        this.update();
     }
 
     /**

@@ -3,6 +3,7 @@ package CTSP.util;
 import CTSP.basic.Individual;
 import CTSP.basic.Params;
 import CTSP.benchmark.Graph;
+import CTSP.benchmark.Vertex;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -173,7 +174,7 @@ public class VNS {
         if(curLength < indiv.cost[indiv.skillfactor]){
             Arrays.fill(indiv.cost,Double.MAX_VALUE);
             indiv.cost[indiv.skillfactor] = curLength;
-            indiv.Chromosome = encodeChromosome(decodeChromosome, indiv.Chromosome, NOVPCinCommonSpace,NOVPCinPrivateSpace,graph.pointPrivateSpace);;
+            indiv.Chromosome = encodeChromosome(decodeChromosome, indiv.Chromosome, NOVPCinCommonSpace,NOVPCinPrivateSpace,graph.pointPrivateSpace);
             positive = true;
         }
         return positive;
@@ -220,5 +221,105 @@ public class VNS {
             tempPath[i+1] = temp;
         }
         return tempPath;
+    }
+
+    public static int[] construction_Solution(double alpha, Graph graph){
+        if(graph.distance_with_Penalize_Edge == null){
+            graph.distance_with_Penalize_Edge = graph.distance.clone();
+
+            //Bắt đầu: Phạt cạnh liên cụm
+            double max_dis = 0;
+            for(int i=0;i<graph.distance_with_Penalize_Edge.length;i++){
+                for(int j=0;j<graph.distance_with_Penalize_Edge[i].length;j++){
+                    if(max_dis < graph.distance_with_Penalize_Edge[i][j]){
+                        max_dis = graph.distance_with_Penalize_Edge[i][j];
+                    }
+                }
+            }
+            double Penalize_Edge = 10*max_dis;
+            for(int i=0;i<graph.distance_with_Penalize_Edge.length;i++){
+                for(int j=0;j<graph.distance_with_Penalize_Edge[i].length;j++){
+                    if(i != j){
+                        graph.distance_with_Penalize_Edge[i][j] += Penalize_Edge;
+                    }
+                }
+            }
+            for(var cluster : graph.listCluster){
+                for(int i = 0;i<cluster.listIDVertex.size();i++){
+                    int v1 = cluster.listIDVertex.get(i) - 1;
+                    for(int j=i+1;j<cluster.listIDVertex.size();j++){
+                        int v2 = cluster.listIDVertex.get(j) - 1;
+                        graph.distance_with_Penalize_Edge[v1][v2] -= Penalize_Edge;
+                        graph.distance_with_Penalize_Edge[v2][v1] -= Penalize_Edge;
+                    }
+                }
+            }
+            //Kết thúc: Phạt cạnh liên cụm
+        }
+
+        //Bắt đầu: Chọn 3 đỉnh
+        int select_v = Params.rand.nextInt(graph.totalVertices);
+        int select_v1=select_v+1,select_v2=select_v+2;
+        double dis_v1 = Double.MAX_VALUE,dis_v2 = Double.MAX_VALUE;
+        for(int i = 0;i<graph.distance_with_Penalize_Edge[select_v].length;i++){
+            if(i == select_v){
+                continue;
+            }
+            if(dis_v1 > graph.distance_with_Penalize_Edge[select_v][i]){
+                dis_v1 = graph.distance_with_Penalize_Edge[select_v][i];
+                select_v1 = i;
+            }
+            if(dis_v2 > graph.distance_with_Penalize_Edge[select_v][i] && dis_v1 < graph.distance_with_Penalize_Edge[select_v][i]){
+                dis_v2 = graph.distance_with_Penalize_Edge[select_v][i];
+                select_v2 = i;
+            }
+        }
+        //Két thúc: Chọn 3 đỉnh
+
+        ArrayList<Vertex> C = new ArrayList<>(graph.vertexList);
+        ArrayList<Integer> S = new ArrayList<>();
+        S.add(select_v);S.add(select_v1);S.add(select_v2);
+        C.removeIf(vertex -> S.contains(vertex.id-1));
+
+        while (!C.isEmpty()){
+            //Bắt đầu: Tìm k đỉnh gần với S
+            ArrayList<Integer> NV = new ArrayList<>();
+            ArrayList<Double> IC = new ArrayList<>();
+            for(int i=0;i<S.size();i++){
+                if((S.size() + NV.size()) == graph.totalVertices){
+                    break;
+                }
+                int temp_select_id = 0;
+                double temp_dis = Double.MAX_VALUE;
+                for(int j=0;j<graph.distance_with_Penalize_Edge[S.get(i)].length;j++){
+                    if(!S.contains(j) &&
+                            !NV.contains(j) &&
+                            temp_dis > graph.distance_with_Penalize_Edge[S.get(i)][j]){
+                        temp_dis = graph.distance_with_Penalize_Edge[S.get(i)][j];
+                        temp_select_id = j;
+                    }
+                }
+                NV.add(temp_select_id);
+                IC.add(temp_dis);
+            }
+            double min_ic = IC.stream().mapToDouble(Double::doubleValue).min().orElseThrow(NullPointerException::new);
+            double max_ic = IC.stream().mapToDouble(Double::doubleValue).max().orElseThrow(NullPointerException::new);
+            double condition_ic = min_ic + alpha * (max_ic - min_ic);
+            //Kết thúc: Tìm k đỉnh gần với S
+
+            //Bắt đầu: Lựa chọn RCL
+            ArrayList<Integer> RCL = new ArrayList<>();
+            for(int i=0;i<IC.size();i++){
+                if(IC.get(i) <= condition_ic){
+                    RCL.add(NV.get(i));
+                }
+            }
+            //Kết thúc: Lựa chọn RCL
+            int temp_select_s = RCL.get(Params.rand.nextInt(RCL.size()));
+            S.add(temp_select_s);
+            C.removeIf(vertex -> vertex.id-1 == temp_select_s);
+        }
+
+        return S.stream().mapToInt(Integer::intValue).toArray();
     }
 }

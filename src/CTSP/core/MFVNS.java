@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static CTSP.util.MFEA.SBX;
+import static CTSP.util.VNS.construction_Solution;
 import static CTSP.util.VNS.localSearch;
 import static CTSP.util.util.*;
 import static CTSP.util.util.giveId;
@@ -39,7 +40,7 @@ public class MFVNS {
             diff_f_inter_x[i] = new ArrayList<>();
         }
 
-        update();
+//        update();
     }
 
     /**
@@ -61,22 +62,14 @@ public class MFVNS {
                     continue;
                 }
                 stop = false;
-
-                int choose; //Lựa chọn loại localSearch
-                boolean positive = false; //Local seach có hiệu quả hay không ?
-
                 ArrayList<Integer> cloneTypeLS = new ArrayList<>(typeLocalSearch);
-
-                while (!cloneTypeLS.isEmpty() && !positive){
-                    choose = Params.rand.nextInt(cloneTypeLS.size());
-                    positive = localSearch(pop.pop.get(i),cloneTypeLS.get(choose),prob.graphs.get(pop.pop.get(i).skillfactor),prob.NOVPCinCommonSpace, prob.pointCommonSpace);
-                    cloneTypeLS.remove(choose);
-                }
+                Individual individual = LocalSearch_Phase(cloneTypeLS,i);
+                Select_Elite(individual);
             }
             //--------------------------------
             if(stop) break;
             //----------MFEA---------------
-            for(int i = 0; i< Params.POP_SIZE; i++){
+            for(int i = 0; i< pop.pop.size(); i++){
                 int j;
                 do{
                     j = Params.rand.nextInt(pop.pop.size());
@@ -144,15 +137,20 @@ public class MFVNS {
      * Phase local search
      * @param typeLocalSearch Danh sách type local search
      */
-    private void LocalSearch_Phase(ArrayList<Integer> typeLocalSearch){
+    private Individual LocalSearch_Phase(ArrayList<Integer> typeLocalSearch, int task){
         int choose; //Lựa chọn loại localSearch
         boolean positive = false; //Local seach có hiệu quả hay không ?
 
+        double alpha = Params.alphaArray[Params.rand.nextInt(Params.alphaArray.length)];
+        int[] S = construction_Solution(alpha, prob.graphs.get(task));
+        Individual individual = new Individual(S,prob.numberOfGraph);
+
         while (!typeLocalSearch.isEmpty() && !positive){
             choose = Params.rand.nextInt(typeLocalSearch.size());
-            positive = localSearch(pop.pop.get(i),typeLocalSearch.get(choose),prob.graphs.get(pop.pop.get(i).skillfactor),prob.NOVPCinCommonSpace, prob.pointCommonSpace);
+            positive = localSearch(individual,typeLocalSearch.get(choose),prob.graphs.get(task),prob.NOVPCinCommonSpace, prob.pointCommonSpace);
             typeLocalSearch.remove(choose);
         }
+        return individual;
     }
 
     /**
@@ -192,5 +190,7 @@ public class MFVNS {
         }
     }
 
-
+    private void Select_Elite(Individual individual){
+        //TODO:
+    }
 }

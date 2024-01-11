@@ -12,6 +12,8 @@ public class Graph {
     public ArrayList<Vertex> vertexList; //danh sách đỉnh
     public double optimal; //Giá trị tối ưu
     public double[][] distance; //distance[i][j] = khoảng cách từ đỉnh i đến đỉnh j
+
+    public double[][] distance_with_Penalize_Edge; //khoảng cách sau khi thực hiện phạt cạnh liên cụm
     public int numberOfCluster; //Số cụm
     public int sourceVertex; //Đỉnh nguồn (Trong bài CTSP không được sử dụng đến)
     public String linkFile;

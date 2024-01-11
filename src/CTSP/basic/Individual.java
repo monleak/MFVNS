@@ -15,7 +15,7 @@ import static CTSP.util.util.shuffleArray;
 public class Individual  implements Comparable<Individual> {
     public static int countID=0;
     public int id;
-    public int[] Chromosome;
+    public int[] Chromosome; //Bắt đầu từ 0
     public double[] cost;
     public int skillfactor; // Bắt đầu đếm từ 0
     public int rank;
@@ -28,6 +28,17 @@ public class Individual  implements Comparable<Individual> {
     public Individual(int maxTotalVertices, int numberOfTask){
         this.id = Individual.countID++;
         Chromosome = randIntArray(maxTotalVertices);
+
+        cost = new double[numberOfTask];
+        Arrays.fill(cost,Double.MAX_VALUE);
+
+        skillfactor = -1;
+        rank = -1;
+    }
+
+    public Individual(int[] chromosome, int numberOfTask){
+        this.id = Individual.countID++;
+        Chromosome = chromosome.clone();
 
         cost = new double[numberOfTask];
         Arrays.fill(cost,Double.MAX_VALUE);

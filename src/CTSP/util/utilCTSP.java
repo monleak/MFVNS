@@ -66,60 +66,41 @@ public class utilCTSP {
 
     /**
      * Tính độ dài đường đi trong không gian riêng
-     * (Thứ tự di chuyển giữa các cluster được quyết định bằng trung bình cộng các nút trong cluster theo thứ tự giảm dần: Lớn hơn đi trước)
-     * Thứ tự di chuyển giữa cluster sẽ được tính sau khi decode
+     * Tính thông qua distance_with_Penalize_Edge sau đó trừ đi số lượng cạnh liên cụm được phép
      *
      * @param graph
      * @param Chromosome
-     * @param pointCommonSpace
-     * @param type 1-Chromosome thuộc không gian chung, 2-Chromosome thuộc KG riêng
      * @return Độ dài đường đi
      */
-    public static double calCost(Graph graph, int[] Chromosome, int type, int[] pointCommonSpace){
+    public static double calCost(Graph graph, int[] Chromosome) {
+        if(graph.distance_with_Penalize_Edge == null){
+            graph.cal_distance_with_Penalize_Edge();
+        }
         double cost = 0;
-        int[] ClusterOrder = new int[graph.numberOfCluster];
-        int[] NOVPCinPrivateSpace = graph.NOVPCinPrivateSpace;
-        int[] decodeChromosome = null;
-        if(type == 1){
-            decodeChromosome = decodeChromosome(graph.totalVertices, Chromosome,pointCommonSpace,NOVPCinPrivateSpace, graph.pointPrivateSpace);
-        }else if(type == 2){
-            decodeChromosome = Chromosome.clone(); 
-        }else {
-            System.exit(9999);
-        }
-        //Tính độ dài đường đi trong các cluster
-        double[] totalCostInCluster = new double[graph.numberOfCluster];
-        int[] pointPrivateSpace = graph.pointPrivateSpace;
-        ArrayList<int[]> listClusterSegment = new ArrayList<>();
-        for(int i=0;i<graph.numberOfCluster;i++){
-            int[] ClusterSegment = getClusterSegment(decodeChromosome,pointPrivateSpace[i],NOVPCinPrivateSpace[i]);
-            //TODO: kiểm tra lại ClusterOrder
-            ClusterOrder[i] = Arrays.stream(ClusterSegment).sum()/ClusterSegment.length;
-            ClusterSegment = convertOrder(ClusterSegment,0);
-            listClusterSegment.add(ClusterSegment);
-            for(int j=0;j<ClusterSegment.length-1;j++){
-                totalCostInCluster[i] += graph.distance[graph.listCluster.get(i).listVertex.get(ClusterSegment[j]).id-1]
-                                                       [graph.listCluster.get(i).listVertex.get(ClusterSegment[j+1]).id-1];
-            }
-        }
-        ClusterOrder = convertOrder2(ClusterOrder);
 
-        //Tính tổng độ dài các đoạn nối
-        double totalCostLink = 0;
-        for(int i=0;i<graph.numberOfCluster-1;i++){
-            totalCostLink += graph.distance
-                            [graph.listCluster.get(ClusterOrder[i]).listVertex.get(listClusterSegment.get(ClusterOrder[i])[listClusterSegment.get(ClusterOrder[i]).length-1]).id-1]
-                            [graph.listCluster.get(ClusterOrder[i+1]).listVertex.get(listClusterSegment.get(ClusterOrder[i+1])[listClusterSegment.get(ClusterOrder[i+1]).length-1]).id-1];
+        for(int i = 0; i<Chromosome.length-1;i++){
+            cost += graph.distance_with_Penalize_Edge[Chromosome[i]][Chromosome[i+1]];
         }
-        totalCostLink += graph.distance
-                [graph.listCluster.get(ClusterOrder[graph.numberOfCluster-1]).listVertex.get(listClusterSegment.get(ClusterOrder[graph.numberOfCluster-1])[listClusterSegment.get(ClusterOrder[graph.numberOfCluster-1]).length-1]).id-1]
-                [graph.listCluster.get(ClusterOrder[0]).listVertex.get(listClusterSegment.get(ClusterOrder[0])[listClusterSegment.get(ClusterOrder[0]).length-1]).id-1];
+        cost += graph.distance_with_Penalize_Edge[Chromosome[Chromosome.length-1]][Chromosome[0]];
+        Params.countEvals++;
+        return cost - graph.numberOfCluster*graph.Penalize_Edge;
+    }
 
-        //Tổng giá trị đường đi = tổng độ dài đường đi trong cluster + tổng độ dài đoạn nối các cluster
-        for(double temp : totalCostInCluster){
-            cost+=temp;
+    /**
+     * Tính cost của 1 đoạn đường có phạt cạnh
+     * @param graph
+     * @param Chromosome có thể chỉ chứa 1 phần NST
+     * @return
+     */
+    public static double calCost_with_Penalize_Edge(Graph graph, int[] Chromosome){
+        if(graph.distance_with_Penalize_Edge == null){
+            graph.cal_distance_with_Penalize_Edge();
         }
-        cost+=totalCostLink;
+        double cost = 0;
+
+        for(int i = 0; i<Chromosome.length-1;i++){
+            cost += graph.distance_with_Penalize_Edge[Chromosome[i]][Chromosome[i+1]];
+        }
         Params.countEvals++;
         return cost;
     }

@@ -92,33 +92,30 @@ public class VNS {
      * @param indiv Cá thể ban đầu
      * @param type Loại localSearch lựa chọn (1 - swap, 2 - 2opt)
      * @param graph Đồ thị cần trùng với skillfactor của cá thể
-     * @param NOVPCinCommonSpace
      * @return boolean Có cải thiện sau khi search hay không (T/F)
      */
-    public static boolean localSearch(Individual indiv, int type, Graph graph, int[] NOVPCinCommonSpace, int[] pointCommonSpace){
-        //TODO: Viết lại. Cấm swap tạo ra các infeasible
+    public static boolean localSearch(Individual indiv, int type, Graph graph, int[] pointCommonSpace){
         boolean positive = false;
         //Shaking
-        int[] NOVPCinPrivateSpace = graph.NOVPCinPrivateSpace;
-        int[] decodeChromosome = decodeChromosome(graph.totalVertices, indiv.Chromosome, pointCommonSpace,NOVPCinPrivateSpace, graph.pointPrivateSpace);
-        decodeChromosome = Shaking(decodeChromosome);
-        double curLength = calCost(graph,decodeChromosome,2,pointCommonSpace);
+        int[] NOVPCinPrivateSpace = graph.NOVPCinPrivateSpace.clone();
+        int[] cloneChromosome = indiv.Chromosome.clone();
+        double curLength = indiv.cost[indiv.skillfactor];
         //--------------swap-------------
         if(type == 1){
             double minDelta = 0;
             int min_i = -1;
-            int decodeLength = decodeChromosome.length;
+            int decodeLength = cloneChromosome.length;
             for(int i=0;i< decodeLength;i++){
                 double deltaLength;
                 if(isExists(graph.pointPrivateSpace, i) || //bỏ điểm đầu cluster
                    isExists(graph.pointPrivateSpace, i+1) || i == decodeLength-1 || //bỏ điểm cuối
                    isExists(graph.pointPrivateSpace, i+2) || i == decodeLength-2 //bỏ sát điểm cuối
                  ){
-                    int[] newDecodeChromosome = swapPath(decodeChromosome,i);
-                    deltaLength = calCost(graph,newDecodeChromosome,2,pointCommonSpace) - curLength;
+                    int[] newDecodeChromosome = swapPath(cloneChromosome,i);
+                    deltaLength = calCost(graph,newDecodeChromosome) - curLength;
                 }else {
                     int inCluster = inCluster(graph.pointPrivateSpace, i);
-                    int[] ClusterSegment = getClusterSegment(decodeChromosome,graph.pointPrivateSpace[inCluster],NOVPCinPrivateSpace[inCluster]);
+                    int[] ClusterSegment = getClusterSegment(cloneChromosome,graph.pointPrivateSpace[inCluster],NOVPCinPrivateSpace[inCluster]);
                     ClusterSegment = convertOrder(ClusterSegment,0);
                     deltaLength = - graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i-graph.pointPrivateSpace[inCluster]]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i-1-graph.pointPrivateSpace[inCluster]]).id-1]
                             - graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i+1-graph.pointPrivateSpace[inCluster]]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i+2-graph.pointPrivateSpace[inCluster]]).id-1]
@@ -132,7 +129,7 @@ public class VNS {
             }
             if(minDelta < 0){
                 curLength += minDelta;
-                decodeChromosome = swapPath(decodeChromosome,min_i);
+                cloneChromosome = swapPath(cloneChromosome,min_i);
             }
         }
             //-------------swap--------------
@@ -140,7 +137,7 @@ public class VNS {
         else if(type == 2){
             //local search trong cùng cluster
             for(int inCluster = 0;inCluster < NOVPCinPrivateSpace.length;inCluster++){
-                int[] ClusterSegment = getClusterSegment(decodeChromosome,graph.pointPrivateSpace[inCluster],NOVPCinPrivateSpace[inCluster]);
+                int[] ClusterSegment = getClusterSegment(cloneChromosome,graph.pointPrivateSpace[inCluster],NOVPCinPrivateSpace[inCluster]);
                 ClusterSegment = convertOrder(ClusterSegment,0);
                 for(int i=0;i<NOVPCinPrivateSpace[inCluster]-3;i++){
                     for(int j=i+2;j<NOVPCinPrivateSpace[inCluster]-1;j++){
@@ -150,7 +147,7 @@ public class VNS {
                                          + graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[j]).id-1];
                         if(lengthDelta < 0){
                             ClusterSegment = do_2_Opt(ClusterSegment,i,j);
-                            decodeChromosome = do_2_Opt(decodeChromosome,i+graph.pointPrivateSpace[inCluster],j+graph.pointPrivateSpace[inCluster]);
+                            cloneChromosome = do_2_Opt(cloneChromosome,i+graph.pointPrivateSpace[inCluster],j+graph.pointPrivateSpace[inCluster]);
                             curLength += lengthDelta;
                         }
                     }
@@ -160,12 +157,12 @@ public class VNS {
             for(int i=0;i<graph.pointPrivateSpace[graph.numberOfCluster-1];i++){
                 //cluster cuối cùng chỉ có thể swap trong chính nó => bỏ qua
                 int inCluster = inCluster(graph.pointPrivateSpace, i);
-                for(int j=graph.pointPrivateSpace[inCluster+1];j<decodeChromosome.length;j++){
-                    int[] newDecodeChromosome = do_2_Opt(decodeChromosome,i,j);
-                    double newCost = calCost(graph,newDecodeChromosome,2,pointCommonSpace);
+                for(int j=graph.pointPrivateSpace[inCluster+1];j<cloneChromosome.length;j++){
+                    int[] newDecodeChromosome = do_2_Opt(cloneChromosome,i,j);
+                    double newCost = calCost(graph,newDecodeChromosome);
                     if(newCost < curLength){
                         curLength = newCost;
-                        decodeChromosome = newDecodeChromosome;
+                        cloneChromosome = newDecodeChromosome;
                     }
                 }
             }
@@ -174,7 +171,7 @@ public class VNS {
         if(curLength < indiv.cost[indiv.skillfactor]){
             Arrays.fill(indiv.cost,Double.MAX_VALUE);
             indiv.cost[indiv.skillfactor] = curLength;
-            indiv.Chromosome = encodeChromosome(decodeChromosome, indiv.Chromosome, NOVPCinCommonSpace,NOVPCinPrivateSpace,graph.pointPrivateSpace);
+            indiv.Chromosome = cloneChromosome;
             positive = true;
         }
         return positive;
@@ -225,36 +222,7 @@ public class VNS {
 
     public static int[] construction_Solution(double alpha, Graph graph){
         if(graph.distance_with_Penalize_Edge == null){
-            graph.distance_with_Penalize_Edge = graph.distance.clone();
-
-            //Bắt đầu: Phạt cạnh liên cụm
-            double max_dis = 0;
-            for(int i=0;i<graph.distance_with_Penalize_Edge.length;i++){
-                for(int j=0;j<graph.distance_with_Penalize_Edge[i].length;j++){
-                    if(max_dis < graph.distance_with_Penalize_Edge[i][j]){
-                        max_dis = graph.distance_with_Penalize_Edge[i][j];
-                    }
-                }
-            }
-            double Penalize_Edge = 10*max_dis;
-            for(int i=0;i<graph.distance_with_Penalize_Edge.length;i++){
-                for(int j=0;j<graph.distance_with_Penalize_Edge[i].length;j++){
-                    if(i != j){
-                        graph.distance_with_Penalize_Edge[i][j] += Penalize_Edge;
-                    }
-                }
-            }
-            for(var cluster : graph.listCluster){
-                for(int i = 0;i<cluster.listIDVertex.size();i++){
-                    int v1 = cluster.listIDVertex.get(i) - 1;
-                    for(int j=i+1;j<cluster.listIDVertex.size();j++){
-                        int v2 = cluster.listIDVertex.get(j) - 1;
-                        graph.distance_with_Penalize_Edge[v1][v2] -= Penalize_Edge;
-                        graph.distance_with_Penalize_Edge[v2][v1] -= Penalize_Edge;
-                    }
-                }
-            }
-            //Kết thúc: Phạt cạnh liên cụm
+            graph.cal_distance_with_Penalize_Edge();
         }
 
         //Bắt đầu: Chọn 3 đỉnh
@@ -293,8 +261,8 @@ public class VNS {
                 double temp_dis = Double.MAX_VALUE;
                 for(int j=0;j<graph.distance_with_Penalize_Edge[S.get(i)].length;j++){
                     if(!S.contains(j) &&
-                            !NV.contains(j) &&
-                            temp_dis > graph.distance_with_Penalize_Edge[S.get(i)][j]){
+                    !NV.contains(j) &&
+                    temp_dis > graph.distance_with_Penalize_Edge[S.get(i)][j]){
                         temp_dis = graph.distance_with_Penalize_Edge[S.get(i)][j];
                         temp_select_id = j;
                     }
@@ -315,9 +283,20 @@ public class VNS {
                 }
             }
             //Kết thúc: Lựa chọn RCL
-            int temp_select_s = RCL.get(Params.rand.nextInt(RCL.size()));
-            S.add(temp_select_s);
-            C.removeIf(vertex -> vertex.id-1 == temp_select_s);
+            var RCL_select_s = RCL.get(Params.rand.nextInt(RCL.size()));
+            double min_cost_solution = Double.MAX_VALUE;
+            int select_index_insert = 0;
+            for(int i = 0;i<S.size();i++){
+                var clone_S = new ArrayList<>(S);
+                clone_S.add(i,RCL_select_s);
+                double temp_cost = calCost_with_Penalize_Edge(graph,clone_S.stream().mapToInt(Integer::intValue).toArray());
+                if(min_cost_solution > temp_cost){
+                    min_cost_solution = temp_cost;
+                    select_index_insert = i;
+                }
+            }
+            S.add(select_index_insert,RCL_select_s);
+            C.removeIf(vertex -> vertex.id-1 == RCL_select_s);
         }
 
         return S.stream().mapToInt(Integer::intValue).toArray();

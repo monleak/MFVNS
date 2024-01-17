@@ -36,14 +36,14 @@ public class Individual  implements Comparable<Individual> {
         rank = -1;
     }
 
-    public Individual(int[] chromosome, int numberOfTask){
+    public Individual(int[] chromosome, int numberOfTask, int task){
         this.id = Individual.countID++;
         Chromosome = chromosome.clone();
 
         cost = new double[numberOfTask];
         Arrays.fill(cost,Double.MAX_VALUE);
 
-        skillfactor = -1;
+        skillfactor = task;
         rank = -1;
     }
 

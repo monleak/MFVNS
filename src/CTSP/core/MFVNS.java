@@ -13,6 +13,8 @@ import static CTSP.util.VNS.construction_Solution;
 import static CTSP.util.VNS.localSearch;
 import static CTSP.util.util.*;
 import static CTSP.util.util.giveId;
+import static CTSP.util.utilCTSP.calCost;
+import static CTSP.util.utilCTSP.calCost_with_Penalize_Edge;
 
 public class MFVNS {
     public CTSP_Population pop;
@@ -143,11 +145,12 @@ public class MFVNS {
 
         double alpha = Params.alphaArray[Params.rand.nextInt(Params.alphaArray.length)];
         int[] S = construction_Solution(alpha, prob.graphs.get(task));
-        Individual individual = new Individual(S,prob.numberOfGraph);
+        Individual individual = new Individual(S,prob.numberOfGraph,task);
+        individual.cost[task] = calCost(prob.graphs.get(task),individual.Chromosome);
 
         while (!typeLocalSearch.isEmpty() && !positive){
             choose = Params.rand.nextInt(typeLocalSearch.size());
-            positive = localSearch(individual,typeLocalSearch.get(choose),prob.graphs.get(task),prob.NOVPCinCommonSpace, prob.pointCommonSpace);
+            positive = localSearch(individual,typeLocalSearch.get(choose),prob.graphs.get(task), prob.pointCommonSpace);
             typeLocalSearch.remove(choose);
         }
         return individual;

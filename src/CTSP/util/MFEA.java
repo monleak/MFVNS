@@ -72,8 +72,8 @@ public class MFEA {
         o1.skillfactor = Params.rand.nextBoolean() ? parentA.skillfactor : parentB.skillfactor;
         o2.skillfactor = Params.rand.nextBoolean() ? parentA.skillfactor : parentB.skillfactor;
 
-        o1.cost[o1.skillfactor] = calCost(prob.graphs.get(o1.skillfactor), o1.Chromosome,1,prob.pointCommonSpace);
-        o2.cost[o2.skillfactor] = calCost(prob.graphs.get(o2.skillfactor), o2.Chromosome,1,prob.pointCommonSpace);
+        o1.cost[o1.skillfactor] = calCost(prob.graphs.get(o1.skillfactor), o1.Chromosome);
+        o2.cost[o2.skillfactor] = calCost(prob.graphs.get(o2.skillfactor), o2.Chromosome);
 
         ArrayList<Individual> child = new ArrayList<>();
         child.add(o1);child.add(o2);

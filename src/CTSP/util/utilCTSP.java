@@ -133,4 +133,25 @@ public class utilCTSP {
         }
         return ClusterSegment;
     }
+
+    /**
+     * Kiểm tra xem 2 đỉnh có nằm cùng cluster hay không
+     * @param graph Đồ thị đầu vào
+     * @param v1 id đỉnh 1
+     * @param v2 id đỉnh 2
+     * @return
+     */
+    public static boolean isSameCluster(Graph graph, int v1, int v2){
+        for (int i = 0; i < graph.listCluster.size(); i++) {
+            var check1 = graph.listCluster.get(i).listIDVertex.contains(v1);
+            var check2 = graph.listCluster.get(i).listIDVertex.contains(v2);
+            if(check1 && check2){
+                return true;
+            }
+            if(check1 || check2){
+                return false;
+            }
+        }
+        return false;
+    }
 }

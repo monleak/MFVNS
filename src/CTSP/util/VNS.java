@@ -94,86 +94,37 @@ public class VNS {
      * @param graph Đồ thị cần trùng với skillfactor của cá thể
      * @return boolean Có cải thiện sau khi search hay không (T/F)
      */
-    public static boolean localSearch(Individual indiv, int type, Graph graph, int[] pointCommonSpace){
+    public static boolean localSearch(Individual indiv, int type, Graph graph){
         boolean positive = false;
         //Shaking
         int[] NOVPCinPrivateSpace = graph.NOVPCinPrivateSpace.clone();
-        int[] cloneChromosome = indiv.Chromosome.clone();
-        double curLength = indiv.cost[indiv.skillfactor];
         //--------------swap-------------
         if(type == 1){
-            double minDelta = 0;
-            int min_i = -1;
-            int decodeLength = cloneChromosome.length;
-            for(int i=0;i< decodeLength;i++){
-                double deltaLength;
-                if(isExists(graph.pointPrivateSpace, i) || //bỏ điểm đầu cluster
-                   isExists(graph.pointPrivateSpace, i+1) || i == decodeLength-1 || //bỏ điểm cuối
-                   isExists(graph.pointPrivateSpace, i+2) || i == decodeLength-2 //bỏ sát điểm cuối
-                 ){
-                    int[] newDecodeChromosome = swapPath(cloneChromosome,i);
-                    deltaLength = calCost(graph,newDecodeChromosome) - curLength;
-                }else {
-                    int inCluster = inCluster(graph.pointPrivateSpace, i);
-                    int[] ClusterSegment = getClusterSegment(cloneChromosome,graph.pointPrivateSpace[inCluster],NOVPCinPrivateSpace[inCluster]);
-                    ClusterSegment = convertOrder(ClusterSegment,0);
-                    deltaLength = - graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i-graph.pointPrivateSpace[inCluster]]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i-1-graph.pointPrivateSpace[inCluster]]).id-1]
-                            - graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i+1-graph.pointPrivateSpace[inCluster]]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i+2-graph.pointPrivateSpace[inCluster]]).id-1]
-                            + graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i-1-graph.pointPrivateSpace[inCluster]]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i+1-graph.pointPrivateSpace[inCluster]]).id-1]
-                            + graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i-graph.pointPrivateSpace[inCluster]]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i+2-graph.pointPrivateSpace[inCluster]]).id-1];
+            for(int i=0;i<indiv.Chromosome.length;i++){
+                int[] cloneChromosome = indiv.Chromosome.clone();
+                cloneChromosome = swapPath(cloneChromosome,i);
+                double temp_cost = calCost(graph,cloneChromosome);
+                if(temp_cost < indiv.cost[indiv.skillfactor]){
+                    indiv.Chromosome = cloneChromosome;
+                    indiv.cost[indiv.skillfactor] = temp_cost;
+                    positive = true;
+                    break;
                 }
-                if(deltaLength < minDelta){
-                    minDelta = deltaLength;
-                    min_i = i;
-                }
-            }
-            if(minDelta < 0){
-                curLength += minDelta;
-                cloneChromosome = swapPath(cloneChromosome,min_i);
             }
         }
-            //-------------swap--------------
-            //------------------2-opt---------------
+        //-------------swap--------------
+        //------------------2-opt---------------
         else if(type == 2){
-            //local search trong cùng cluster
-            for(int inCluster = 0;inCluster < NOVPCinPrivateSpace.length;inCluster++){
-                int[] ClusterSegment = getClusterSegment(cloneChromosome,graph.pointPrivateSpace[inCluster],NOVPCinPrivateSpace[inCluster]);
-                ClusterSegment = convertOrder(ClusterSegment,0);
-                for(int i=0;i<NOVPCinPrivateSpace[inCluster]-3;i++){
-                    for(int j=i+2;j<NOVPCinPrivateSpace[inCluster]-1;j++){
-                        double lengthDelta = - graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i+1]).id-1]
-                                         - graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[j]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[j+1]).id-1]
-                                         + graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i+1]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[j+1]).id-1]
-                                         + graph.distance[graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[i]).id-1][graph.listCluster.get(inCluster).listVertex.get(ClusterSegment[j]).id-1];
-                        if(lengthDelta < 0){
-                            ClusterSegment = do_2_Opt(ClusterSegment,i,j);
-                            cloneChromosome = do_2_Opt(cloneChromosome,i+graph.pointPrivateSpace[inCluster],j+graph.pointPrivateSpace[inCluster]);
-                            curLength += lengthDelta;
-                        }
-                    }
-                }
-            }
-            //local search cả các cluster khác
-            for(int i=0;i<graph.pointPrivateSpace[graph.numberOfCluster-1];i++){
-                //cluster cuối cùng chỉ có thể swap trong chính nó => bỏ qua
-                int inCluster = inCluster(graph.pointPrivateSpace, i);
-                for(int j=graph.pointPrivateSpace[inCluster+1];j<cloneChromosome.length;j++){
-                    int[] newDecodeChromosome = do_2_Opt(cloneChromosome,i,j);
-                    double newCost = calCost(graph,newDecodeChromosome);
-                    if(newCost < curLength){
-                        curLength = newCost;
-                        cloneChromosome = newDecodeChromosome;
-                    }
+            for (int i = 0; i < indiv.Chromosome.length - 2; i++) {
+                for (int j = i+2; j < indiv.Chromosome.length; j++) {
+                    //check xem 2 cạnh có chung cluster hay không
+                    int e1_1, e1_2;
+                    int e2_1,e2_2;
+
                 }
             }
         }
         //--------------------2-opt----------------------
-        if(curLength < indiv.cost[indiv.skillfactor]){
-            Arrays.fill(indiv.cost,Double.MAX_VALUE);
-            indiv.cost[indiv.skillfactor] = curLength;
-            indiv.Chromosome = cloneChromosome;
-            positive = true;
-        }
         return positive;
     }
     /**

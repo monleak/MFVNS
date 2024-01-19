@@ -83,7 +83,10 @@ public class Graph {
     }
 
     public void cal_distance_with_Penalize_Edge(){
-        this.distance_with_Penalize_Edge = this.distance.clone();
+        this.distance_with_Penalize_Edge = new double[this.distance.length][];
+        for (int i = 0; i < this.distance_with_Penalize_Edge.length; i++) {
+            this.distance_with_Penalize_Edge[i] = this.distance[i].clone();
+        }
 
         //Bắt đầu: Phạt cạnh liên cụm
         double max_dis = 0;

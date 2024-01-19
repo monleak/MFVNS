@@ -150,7 +150,7 @@ public class MFVNS {
 
         while (!typeLocalSearch.isEmpty() && !positive){
             choose = Params.rand.nextInt(typeLocalSearch.size());
-            positive = localSearch(individual,typeLocalSearch.get(choose),prob.graphs.get(task), prob.pointCommonSpace);
+            positive = localSearch(individual,typeLocalSearch.get(choose),prob.graphs.get(task));
             typeLocalSearch.remove(choose);
         }
         return individual;

@@ -119,8 +119,45 @@ public class VNS {
                 for (int j = i+2; j < indiv.Chromosome.length; j++) {
                     //check xem 2 cạnh có chung cluster hay không
                     int e1_1, e1_2;
-                    int e2_1,e2_2;
+                    int e2_1, e2_2;
+                    e1_1 = indiv.Chromosome[i];
+                    e1_2 = indiv.Chromosome[i+1];
 
+                    if(j==indiv.Chromosome.length-1){
+                        if(i==0){
+                            //tránh trường hợp 2 cạnh liền kề
+                            continue;
+                        }
+                        e2_1 = indiv.Chromosome[j];
+                        e2_2 = indiv.Chromosome[0];
+                    }else {
+                        e2_1 = indiv.Chromosome[j];
+                        e2_2 = indiv.Chromosome[j+1];
+                    }
+
+                    boolean check1 = isSameCluster(graph,e1_1,e1_2);
+                    boolean check2 = isSameCluster(graph,e2_1,e2_2);
+                    boolean check3 = false;
+                    if(check1 && check2){
+                        if(isSameCluster(graph,e1_1,e2_1)){
+                            //tất cả cạnh đều nằm trong cluster
+                            check3 = true;
+                        }
+                    }else if(!check1 && !check2){
+                        //tất cả cạnh đều là cạnh liên cụm
+                        check3 = true;
+                    }
+
+                    if(check3){
+                        int[] cloneChromosome = indiv.Chromosome.clone();
+                        cloneChromosome = do_2_Opt(cloneChromosome,i,j);
+                        double temp_cost = calCost(graph,cloneChromosome);
+                        if(temp_cost < indiv.cost[indiv.skillfactor]){
+                            indiv.Chromosome = cloneChromosome;
+                            indiv.cost[indiv.skillfactor] = temp_cost;
+                            positive = true;
+                        }
+                    }
                 }
             }
         }

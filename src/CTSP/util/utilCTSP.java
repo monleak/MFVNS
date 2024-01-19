@@ -142,9 +142,10 @@ public class utilCTSP {
      * @return
      */
     public static boolean isSameCluster(Graph graph, int v1, int v2){
+        //v1,v2 cần +1 để ra id của đỉnh
         for (int i = 0; i < graph.listCluster.size(); i++) {
-            var check1 = graph.listCluster.get(i).listIDVertex.contains(v1);
-            var check2 = graph.listCluster.get(i).listIDVertex.contains(v2);
+            var check1 = graph.listCluster.get(i).listIDVertex.contains(v1+1);
+            var check2 = graph.listCluster.get(i).listIDVertex.contains(v2+1);
             if(check1 && check2){
                 return true;
             }

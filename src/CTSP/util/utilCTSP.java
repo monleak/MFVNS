@@ -1,10 +1,12 @@
 package CTSP.util;
 
+import CTSP.basic.Individual;
 import CTSP.basic.Params;
 import CTSP.benchmark.Graph;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 import static CTSP.util.util.convertOrder;
 import static CTSP.util.util.convertOrder2;
@@ -154,5 +156,34 @@ public class utilCTSP {
             }
         }
         return false;
+    }
+
+    /**
+     * Tính toán sự khác nhau trong gen giữa 2 cá thể
+     * @param indiv1
+     * @param indiv2
+     * @return int
+     */
+    public static int calDif(Individual indiv1, Individual indiv2){
+        int dif = 0;
+        for (int i = 0; i < indiv1.Chromosome.length; i++) {
+            int target = indiv1.Chromosome[i];
+            int j = IntStream.range(0, indiv2.Chromosome.length)
+                    .filter(n -> indiv2.Chromosome[n] == target)
+                    .findFirst()
+                    .orElse(-1);
+            int prev_j = j-1;
+            int successor_j = j+1;
+            if(j==0){
+                prev_j = indiv2.Chromosome.length-1;
+            }
+            if(j==indiv2.Chromosome.length-1){
+                successor_j = 0;
+            }
+            if(!(indiv2.Chromosome[prev_j] == indiv1.Chromosome[i] || indiv2.Chromosome[successor_j] == indiv1.Chromosome[i])){
+                dif++;
+            }
+        }
+        return dif;
     }
 }

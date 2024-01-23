@@ -22,8 +22,8 @@ public class MFEA {
         //TODO: fix lỗi, nhận định ban đầu là do gen của 2 cá thể truyền vào bị lỗi, cần kiểm tra lại các hàm thay đổi gen, decode, encode
         int maxTotalVertices = prob.maxTotalVertices;
         //Khởi tạo 2 cá thể con mới
-        Individual o1 = new Individual(maxTotalVertices, prob.numberOfGraph);
-        Individual o2 = new Individual(maxTotalVertices, prob.numberOfGraph);
+        Individual o1 = new Individual(maxTotalVertices);
+        Individual o2 = new Individual(maxTotalVertices);
 
         int[] ChromosomeA = parentA.Chromosome.clone();
         int[] ChromosomeB = parentB.Chromosome.clone();
@@ -72,8 +72,8 @@ public class MFEA {
         o1.skillfactor = Params.rand.nextBoolean() ? parentA.skillfactor : parentB.skillfactor;
         o2.skillfactor = Params.rand.nextBoolean() ? parentA.skillfactor : parentB.skillfactor;
 
-        o1.cost[o1.skillfactor] = calCost(prob.graphs.get(o1.skillfactor), o1.Chromosome);
-        o2.cost[o2.skillfactor] = calCost(prob.graphs.get(o2.skillfactor), o2.Chromosome);
+        o1.cost = calCost(prob.graphs.get(o1.skillfactor), o1.Chromosome);
+        o2.cost = calCost(prob.graphs.get(o2.skillfactor), o2.Chromosome);
 
         ArrayList<Individual> child = new ArrayList<>();
         child.add(o1);child.add(o2);

@@ -104,9 +104,9 @@ public class VNS {
                 int[] cloneChromosome = indiv.Chromosome.clone();
                 cloneChromosome = swapPath(cloneChromosome,i);
                 double temp_cost = calCost(graph,cloneChromosome);
-                if(temp_cost < indiv.cost[indiv.skillfactor]){
+                if(temp_cost < indiv.cost){
                     indiv.Chromosome = cloneChromosome;
-                    indiv.cost[indiv.skillfactor] = temp_cost;
+                    indiv.cost = temp_cost;
                     positive = true;
                     break;
                 }
@@ -152,9 +152,9 @@ public class VNS {
                         int[] cloneChromosome = indiv.Chromosome.clone();
                         cloneChromosome = do_2_Opt(cloneChromosome,i,j);
                         double temp_cost = calCost(graph,cloneChromosome);
-                        if(temp_cost < indiv.cost[indiv.skillfactor]){
+                        if(temp_cost < indiv.cost){
                             indiv.Chromosome = cloneChromosome;
-                            indiv.cost[indiv.skillfactor] = temp_cost;
+                            indiv.cost = temp_cost;
                             positive = true;
                         }
                     }

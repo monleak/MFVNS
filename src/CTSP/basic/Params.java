@@ -10,7 +10,7 @@ public class Params {
     public static String linkOutputCTSP = "CTSP//";
     public static String linkLarge = "Large//";
     public static String linkSmall = "Small//";
-    public static int POP_SIZE= 500;
+    public static int POP_SIZE = 10;
     public static int kmax = 4;
     public static Random rand; //Được khởi tạo theo các seed
     public static double countEvals; //Đếm số lần đánh giá
@@ -22,4 +22,5 @@ public class Params {
     public static double bigNumber = 10000000;
     public static final double C = 0.02;
     public static Double[] alphaArray = new Double[]{0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0};
+    public static int mindif = 5; //Độ sai khác tối thiểu giữa 2 gen
 }

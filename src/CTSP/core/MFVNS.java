@@ -17,7 +17,7 @@ import static CTSP.util.utilCTSP.calCost;
 import static CTSP.util.utilCTSP.calCost_with_Penalize_Edge;
 
 public class MFVNS {
-    public CTSP_Population pop;
+    public ArrayList<CTSP_Population> pops;
     public Problem prob;
     public double rmp[]; //Bộ nhớ lịch sử thành công rmp
 
@@ -31,7 +31,10 @@ public class MFVNS {
     public MFVNS(Problem prob){
         this.prob = prob;
 
-        pop = new CTSP_Population(prob);
+        pops = new ArrayList<>();
+        for (int i = 0; i < prob.numberOfGraph; i++) {
+            pops.add(new CTSP_Population(prob.graphs.get(i),i));
+        }
 
         rmp = new double[(prob.graphs.size()+1)*prob.graphs.size()/2];
         Arrays.fill(rmp,0.5);
@@ -59,52 +62,52 @@ public class MFVNS {
             for(int i=1;i<=2;i++){  //Hiện tại đang có 2 toán tử local search
                 typeLocalSearch.add(i);
             }
-            for(int i=0;i<pop.prob.numberOfGraph;i++){ //Mỗi đồ thị tạo 1 cá thể local search mới
-                if((int)pop.best[i] <= prob.graphs.get(i).optimal){
+            for(int i=0;i<prob.numberOfGraph;i++){ //Mỗi đồ thị tạo 1 cá thể local search mới
+                if((int)pops.get(i).best_cost <= prob.graphs.get(i).optimal){
                     continue;
                 }
                 stop = false;
                 ArrayList<Integer> cloneTypeLS = new ArrayList<>(typeLocalSearch);
                 Individual individual = LocalSearch_Phase(cloneTypeLS,i);
-                Select_Elite(individual);
+                this.pops.get(i).addToEliteSet(individual);
             }
             //--------------------------------
             if(stop) break;
             //----------MFEA---------------
-            for(int i = 0; i< pop.pop.size(); i++){
-                int j;
-                do{
-                    j = Params.rand.nextInt(pop.pop.size());
-                }while (j==i);
-
-                if(pop.pop.get(i).skillfactor == pop.pop.get(j).skillfactor){
-                    ArrayList<Individual> child = SBX(pop.pop.get(i),pop.pop.get(j),prob);
-                    pop.pop.addAll(child);
-                }else {
-                    double currentRmp = rmp[giveId(pop.pop.get(i).skillfactor,pop.pop.get(j).skillfactor,prob)];
-                    if(Params.rand.nextDouble() < currentRmp){
-                        ArrayList<Individual> child = SBX(pop.pop.get(i),pop.pop.get(j),prob);
-                        for(int o=0;o<child.size();o++){
-                            double delta;
-
-                            if(child.get(o).skillfactor == pop.pop.get(i).skillfactor){
-                                delta = pop.pop.get(i).cost[pop.pop.get(i).skillfactor] - child.get(o).cost[pop.pop.get(i).skillfactor];
-                            }else{
-                                delta = pop.pop.get(j).cost[pop.pop.get(j).skillfactor] - child.get(o).cost[pop.pop.get(j).skillfactor];
-                            }
-
-                            if(delta == 0){
-                                pop.pop.add(child.get(o));
-                            }else if(delta > 0){
-                                s_rmp[giveId(pop.pop.get(i).skillfactor,pop.pop.get(j).skillfactor,prob)].add(currentRmp);
-                                diff_f_inter_x[giveId(pop.pop.get(i).skillfactor,pop.pop.get(j).skillfactor,prob)].add(delta);
-                                pop.pop.add(child.get(o));
-                            }
-                        }
-                    }
-                }
-
-            }
+//            for(int i = 0; i< pop.pop.size(); i++){
+//                int j;
+//                do{
+//                    j = Params.rand.nextInt(pop.pop.size());
+//                }while (j==i);
+//
+//                if(pop.pop.get(i).skillfactor == pop.pop.get(j).skillfactor){
+//                    ArrayList<Individual> child = SBX(pop.pop.get(i),pop.pop.get(j),prob);
+//                    pop.pop.addAll(child);
+//                }else {
+//                    double currentRmp = rmp[giveId(pop.pop.get(i).skillfactor,pop.pop.get(j).skillfactor,prob)];
+//                    if(Params.rand.nextDouble() < currentRmp){
+//                        ArrayList<Individual> child = SBX(pop.pop.get(i),pop.pop.get(j),prob);
+//                        for(int o=0;o<child.size();o++){
+//                            double delta;
+//
+//                            if(child.get(o).skillfactor == pop.pop.get(i).skillfactor){
+//                                delta = pop.pop.get(i).cost[pop.pop.get(i).skillfactor] - child.get(o).cost[pop.pop.get(i).skillfactor];
+//                            }else{
+//                                delta = pop.pop.get(j).cost[pop.pop.get(j).skillfactor] - child.get(o).cost[pop.pop.get(j).skillfactor];
+//                            }
+//
+//                            if(delta == 0){
+//                                pop.pop.add(child.get(o));
+//                            }else if(delta > 0){
+//                                s_rmp[giveId(pop.pop.get(i).skillfactor,pop.pop.get(j).skillfactor,prob)].add(currentRmp);
+//                                diff_f_inter_x[giveId(pop.pop.get(i).skillfactor,pop.pop.get(j).skillfactor,prob)].add(delta);
+//                                pop.pop.add(child.get(o));
+//                            }
+//                        }
+//                    }
+//                }
+//
+//            }
             //------------------------------------
 
             update();
@@ -113,23 +116,16 @@ public class MFVNS {
             System.out.print(count+" "+ Params.countEvals+": ");
             temp += count+" "+ Params.countEvals+": ";
             for (int i=0;i<prob.graphs.size();i++) {
-                if((int)pop.best[i] <= prob.graphs.get(i).optimal){
-                    System.out.print("*"+pop.best[i]+" ");
+                if((int)this.pops.get(i).best_cost <= prob.graphs.get(i).optimal){
+                    System.out.print("*"+this.pops.get(i).best_cost+" ");
                 }else {
-                    System.out.print(pop.best[i]+" ");
+                    System.out.print(this.pops.get(i).best_cost+" ");
                 }
-                temp += pop.best[i]+" ";
+                temp += this.pops.get(i).best_cost+" ";
             }
             System.out.print("\n");
             temp+="\n";
             result.add(temp);
-
-//            System.out.print(count+": ");
-//            for (double a :
-//                    rmp) {
-//                System.out.print(a + " ");
-//            }
-//            System.out.print("\n");
 
             count++;
         }
@@ -145,8 +141,8 @@ public class MFVNS {
 
         double alpha = Params.alphaArray[Params.rand.nextInt(Params.alphaArray.length)];
         int[] S = construction_Solution(alpha, prob.graphs.get(task));
-        Individual individual = new Individual(S,prob.numberOfGraph,task);
-        individual.cost[task] = calCost(prob.graphs.get(task),individual.Chromosome);
+        Individual individual = new Individual(S,task);
+        individual.cost = calCost(prob.graphs.get(task),individual.Chromosome);
 
         while (!typeLocalSearch.isEmpty() && !positive){
             choose = Params.rand.nextInt(typeLocalSearch.size());
@@ -160,7 +156,6 @@ public class MFVNS {
      * Update quần thể khi qua thế hệ mới
      */
     public void update(){
-        pop.update();
         // update RMP
         double maxRmp = 0;
         for (int i = 0; i < rmp.length; i++) {

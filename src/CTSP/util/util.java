@@ -105,17 +105,18 @@ public class util {
     }
 
     /**
-     * Kiểm tra xem n có tồn tại trong mảng arr hay không
+     * Kiểm tra xem n có tồn tại trong mảng arr hay không, nếu có thì trả về index
+     * -1 nghĩa là không tồn tại
      * @param arr
      * @param n
      * @return
      */
-    public static boolean isExists(int[] arr, int n){
-        for(int i : arr){
-            if(i==n){
-                return true;
+    public static int isExists(int[] arr, int n){
+        for (int i = 0; i < arr.length; i++) {
+            if(arr[i] == n){
+                return i;
             }
         }
-        return false;
+        return -1;
     }
 }

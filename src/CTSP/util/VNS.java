@@ -172,6 +172,11 @@ public class VNS {
      * @return Gen sau khi biến đổi
      */
     public static int[] do_2_Opt(int[] path, int i, int j){
+        if(i > j){
+            int temp = i;
+            i = j;
+            j = temp;
+        }
         int[] x = new int[path.length];
         int countId = 0;
         for (int id=0;id<=i;id++){
@@ -288,5 +293,65 @@ public class VNS {
         }
 
         return S.stream().mapToInt(Integer::intValue).toArray();
+    }
+
+    public static Individual pathRelink(Graph graph, Individual indivA, Individual indivB){
+        Individual Si,Sg;
+        if(indivA.cost < indivB.cost){
+            Si = indivA.clone();
+            Sg = indivB;
+        }else{
+            Si = indivB.clone();
+            Sg = indivA;
+        }
+        if(Si.cost == Sg.cost){
+            return null;
+        }
+
+        boolean improve = true;
+        while (improve){
+            improve = false;
+            for (int i = 0; i < Si.Chromosome.length; i++) {
+                int value_vi_Si = Si.Chromosome[i]; //vi là đỉnh thứ i trong Si
+                int index_vi_in_Sg = isExists(Sg.Chromosome,value_vi_Si);
+                if(index_vi_in_Sg == -1){
+                    return null;
+                }
+                int value_vk_Sg;
+                if(index_vi_in_Sg == Sg.Chromosome.length - 1){
+                    value_vk_Sg = Sg.Chromosome[0];
+                }else{
+                    value_vk_Sg = Sg.Chromosome[index_vi_in_Sg+1];
+                }
+                int index_vk_in_Si = isExists(Si.Chromosome,value_vk_Sg);
+                if(index_vk_in_Si == -1){
+                    return null;
+                }
+                if(index_vk_in_Si == 100){
+                    int n=3;
+                }
+
+                int successor_i;
+                if(i == Si.Chromosome.length-1){
+                    successor_i = 0;
+                }else {
+                    successor_i = i+1;
+                }
+                if(index_vk_in_Si != successor_i && isSameCluster(graph,i,index_vk_in_Si)){
+                    int[] new_solution = do_2_Opt(Si.Chromosome,i,index_vk_in_Si);
+                    double new_cost = calCost(graph,new_solution);
+                    if(new_cost < Si.cost){
+                        Si.Chromosome = new_solution;
+                        Si.cost = new_cost;
+                        improve = true;
+                    }
+                }
+            }
+        }
+        if(Si.cost < indivA.cost && Si.cost < indivB.cost){
+            return Si;
+        }else{
+            return null;
+        }
     }
 }

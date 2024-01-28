@@ -186,4 +186,22 @@ public class utilCTSP {
         }
         return dif;
     }
+
+    /**
+     * Kiểm tra xem 2 cạnh có phải giống nhau hay không
+     * @param e1_1
+     * @param e1_2
+     * @param e2_1
+     * @param e2_2
+     * @return
+     */
+    public static boolean isSameEdge(int e1_1, int e1_2, int e2_1, int e2_2){
+        boolean check = false;
+        if(e1_1 == e2_1 || e1_1 == e2_2){
+            if(e1_2 == e2_1 || e1_2 == e2_2){
+                check = true;
+            }
+        }
+        return check;
+    }
 }

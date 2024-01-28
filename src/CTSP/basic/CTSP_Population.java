@@ -58,10 +58,11 @@ public class CTSP_Population {
      * @param indiv
      */
     public void addToEliteSet(Individual indiv){
+        if(indiv.cost < best_cost){
+            best_cost = indiv.cost;
+        }
         if(pop.size() < Params.POP_SIZE){
             pop.add(indiv);
-            sortPop();
-            this.best_cost = this.pop.get(0).cost;
         }else {
             sortPop();
             if(indiv.cost < this.pop.get(this.pop.size()-1).cost){
@@ -83,8 +84,6 @@ public class CTSP_Population {
                     }
                     this.pop.remove(index_out);
                     this.pop.add(indiv);
-                    sortPop();
-                    this.best_cost = this.pop.get(0).cost;
                 }
             }
         }

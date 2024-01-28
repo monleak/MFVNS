@@ -9,12 +9,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static CTSP.util.MFEA.SBX;
-import static CTSP.util.VNS.construction_Solution;
-import static CTSP.util.VNS.localSearch;
+import static CTSP.util.VNS.*;
 import static CTSP.util.util.*;
 import static CTSP.util.util.giveId;
-import static CTSP.util.utilCTSP.calCost;
-import static CTSP.util.utilCTSP.calCost_with_Penalize_Edge;
+import static CTSP.util.utilCTSP.*;
 
 public class MFVNS {
     public ArrayList<CTSP_Population> pops;
@@ -28,14 +26,23 @@ public class MFVNS {
     public ArrayList<Double>[] s_rmp;
     public ArrayList<Double>[] diff_f_inter_x; //Sử dụng để tính độ ảnh hưởng của index i đến việc cập nhật rmp[]
 
+    public double[] alphaArray;
+    public double[][] probabilitySelectAlpha; //Xác suất lựa chọn alpha
+    public double[][] sumCostSelectAlpha; //Tổng cost trong maxProb lần lặp trước đó
+    public double[][] bestCostSelectAlpha; //Giá trị cost tốt nhất tronng maxProb lần lặp trước đó
+    public int[][] countSelectAlpha;
+
     public MFVNS(Problem prob){
         this.prob = prob;
-
         pops = new ArrayList<>();
         for (int i = 0; i < prob.numberOfGraph; i++) {
             pops.add(new CTSP_Population(prob.graphs.get(i),i));
         }
+        initRmp();
+        initAlpha();
+    }
 
+    private void initRmp(){
         rmp = new double[(prob.graphs.size()+1)*prob.graphs.size()/2];
         Arrays.fill(rmp,0.5);
         s_rmp = new ArrayList[(prob.graphs.size()+1)*prob.graphs.size()/2];
@@ -44,8 +51,23 @@ public class MFVNS {
             s_rmp[i] = new ArrayList<>();
             diff_f_inter_x[i] = new ArrayList<>();
         }
+    }
 
-//        update();
+    private void initAlpha(){
+        alphaArray = new double[]{0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0};
+
+        probabilitySelectAlpha = new double[prob.numberOfGraph][];
+        sumCostSelectAlpha = new double[prob.numberOfGraph][];
+        countSelectAlpha = new int[prob.numberOfGraph][];
+        bestCostSelectAlpha = new double[prob.numberOfGraph][];
+        for (int i = 0; i < prob.numberOfGraph; i++) {
+            probabilitySelectAlpha[i] = new double[]{0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+            sumCostSelectAlpha[i] = new double[alphaArray.length];
+            countSelectAlpha[i] = new int[alphaArray.length];
+
+            bestCostSelectAlpha[i] = new double[alphaArray.length];
+            Arrays.fill(bestCostSelectAlpha[i], Double.MAX_VALUE);
+        }
     }
 
     /**
@@ -54,7 +76,9 @@ public class MFVNS {
      */
     public void run(ArrayList<String> result){
         int count = 0;
+        int iterprob = 0;
         boolean stop = false;
+        long startTime = System.nanoTime();
         while (count < Params.maxGeneration /*Params.countEvals < Params.maxEvals*/){
             stop = true;
             //----------local search----------
@@ -69,7 +93,22 @@ public class MFVNS {
                 stop = false;
                 ArrayList<Integer> cloneTypeLS = new ArrayList<>(typeLocalSearch);
                 Individual individual = LocalSearch_Phase(cloneTypeLS,i);
-                this.pops.get(i).addToEliteSet(individual);
+                Individual new_indiv = null;
+                if(count > Params.POP_SIZE){
+                    var select_indiv = pops.get(i).pop.get(Params.rand.nextInt(pops.get(i).pop.size()));
+                    new_indiv = pathRelink(prob.graphs.get(i),individual,select_indiv);
+                }
+                if(new_indiv != null){
+                    this.pops.get(i).addToEliteSet(new_indiv);
+                }else {
+                    this.pops.get(i).addToEliteSet(individual);
+                }
+            }
+
+            iterprob++;
+            if(iterprob == Params.maxProb){
+                updateAlpha();
+                iterprob = 0;
             }
             //--------------------------------
             if(stop) break;
@@ -112,6 +151,18 @@ public class MFVNS {
 
             update();
 
+            if(count >= Params.maxGeneration-1){ //Lần lặp cuối
+                for(int i=0;i<pops.size();i++){
+                    pops.get(i).sortPop();
+                    for (int j = 1; j < pops.get(i).pop.size(); j++) {
+                        Individual new_indiv = pathRelink(prob.graphs.get(i),pops.get(i).pop.get(0),pops.get(i).pop.get(j));
+                        if(new_indiv != null){
+                            this.pops.get(i).addToEliteSet(new_indiv);
+                        }
+                    }
+                }
+            }
+
             String temp = new String();
             System.out.print(count+" "+ Params.countEvals+": ");
             temp += count+" "+ Params.countEvals+": ";
@@ -126,8 +177,68 @@ public class MFVNS {
             System.out.print("\n");
             temp+="\n";
             result.add(temp);
-
             count++;
+        }
+
+        long endTime = System.nanoTime();
+        double totalTimeSeconds = (endTime - startTime) / 1_000_000_000.0;
+        System.out.println("Total execution time: " + totalTimeSeconds + " seconds\n");
+        result.add("Total execution time: " + totalTimeSeconds + " seconds\n");
+    }
+
+    private double getAlpha(int task) {
+        double p = Params.rand.nextDouble();
+        double alpha = 0;
+        for (int i = 0; i < probabilitySelectAlpha[task].length; i++) {
+            double p1,p2;
+            if(i == 0){
+                p1 = 0;
+            }else{
+                p1 = probabilitySelectAlpha[task][i-1];
+            }
+            p2 = probabilitySelectAlpha[task][i];
+            if(p >= p1 && p < p2){
+                if(i == 0){
+                    alpha = alphaArray[0];
+                }else {
+                    alpha = alphaArray[i-1];
+                }
+            }
+        }
+        return alpha;
+    }
+
+    private void updateAlpha(){
+        for (int task = 0; task < prob.numberOfGraph; task++) {
+            double[] arrayQ = new double[probabilitySelectAlpha[task].length];
+            for (int i = 0; i < probabilitySelectAlpha[task].length; i++) {
+                if(countSelectAlpha[task][i] > 0){
+                    double averageCost = sumCostSelectAlpha[task][i]/countSelectAlpha[task][i];
+                    arrayQ[i] = bestCostSelectAlpha[task][i]/averageCost;
+                }
+            }
+            double sumQ = Arrays.stream(arrayQ).sum();
+            for (int i = 0; i < arrayQ.length; i++) {
+                if(arrayQ[i] == 0){
+                    if(i==0){
+                        arrayQ[i] = probabilitySelectAlpha[task][i] * sumQ;
+                    }else{
+                        arrayQ[i] = (probabilitySelectAlpha[task][i] - probabilitySelectAlpha[task][i-1])*sumQ;
+                    }
+                }
+            }
+            sumQ = Arrays.stream(arrayQ).sum();
+            for (int i = 0; i < probabilitySelectAlpha[task].length; i++) {
+                if(i == 0){
+                    probabilitySelectAlpha[task][i] = arrayQ[i]/sumQ + 0;
+                }else {
+                    probabilitySelectAlpha[task][i] = arrayQ[i]/sumQ + probabilitySelectAlpha[task][i-1];
+                }
+            }
+
+            Arrays.fill(sumCostSelectAlpha[task],0);
+            Arrays.fill(countSelectAlpha[task],0);
+            Arrays.fill(bestCostSelectAlpha[task], Double.MAX_VALUE);
         }
     }
 
@@ -139,7 +250,7 @@ public class MFVNS {
         int choose; //Lựa chọn loại localSearch
         boolean positive = false; //Local seach có hiệu quả hay không ?
 
-        double alpha = Params.alphaArray[Params.rand.nextInt(Params.alphaArray.length)];
+        double alpha = getAlpha(task);
         int[] S = construction_Solution(alpha, prob.graphs.get(task));
         Individual individual = new Individual(S,task);
         individual.cost = calCost(prob.graphs.get(task),individual.Chromosome);
@@ -149,13 +260,19 @@ public class MFVNS {
             positive = localSearch(individual,typeLocalSearch.get(choose),prob.graphs.get(task));
             typeLocalSearch.remove(choose);
         }
+        int indexAlpha = (int) (alpha*10 - 1);
+        sumCostSelectAlpha[task][indexAlpha] += individual.cost;
+        countSelectAlpha[task][indexAlpha] ++;
+        if(bestCostSelectAlpha[task][indexAlpha] > individual.cost){
+            bestCostSelectAlpha[task][indexAlpha] = individual.cost;
+        }
         return individual;
     }
 
     /**
      * Update quần thể khi qua thế hệ mới
      */
-    public void update(){
+    private void update(){
         // update RMP
         double maxRmp = 0;
         for (int i = 0; i < rmp.length; i++) {
@@ -186,9 +303,5 @@ public class MFVNS {
             s_rmp[i].clear();
             diff_f_inter_x[i].clear();
         }
-    }
-
-    private void Select_Elite(Individual individual){
-        //TODO:
     }
 }

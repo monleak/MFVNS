@@ -40,6 +40,12 @@ public class Individual  implements Comparable<Individual> {
         rank = -1;
     }
 
+    public Individual clone(){
+        Individual indiv = new Individual(this.Chromosome,this.skillfactor);
+        indiv.cost = this.cost;
+        return indiv;
+    }
+
     @Override
     public int compareTo(Individual o) {
         return Double.valueOf(this.cost).compareTo(o.cost);

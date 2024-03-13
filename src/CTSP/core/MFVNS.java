@@ -53,6 +53,7 @@ public class MFVNS {
     public void run(ArrayList<String> result){
         int count = 0;
         boolean stop = false;
+        long startTime = System.currentTimeMillis();
         while (count < Params.maxGeneration /*Params.countEvals < Params.maxEvals*/){
             stop = true;
             //----------local search----------
@@ -154,6 +155,10 @@ public class MFVNS {
 
             count++;
         }
+        long endTime = System.currentTimeMillis();
+        double elapsedTimeInSeconds = (endTime - startTime)/1000.0;
+        System.out.println("Thoi gian chay: "+ elapsedTimeInSeconds+" giay");
+        result.add("Thoi gian chay: "+ elapsedTimeInSeconds+" giay\n");
     }
 
     /**

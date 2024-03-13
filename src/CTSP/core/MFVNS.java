@@ -60,12 +60,18 @@ public class MFVNS {
             for(int i=1;i<=2;i++){  //Hiện tại đang có 2 toán tử local search
                 typeLocalSearch.add(i);
             }
+
+            boolean checkIndivPositive = false;
             for(int i=0;i<pop.pop.size();i++){
                 if((int)best[pop.pop.get(i).skillfactor] <= prob.graphs.get(pop.pop.get(i).skillfactor).optimal){
                     continue;
                 }
                 stop = false;
 
+                if(pop.pop.get(i).countNegative >= Params.MAX_NEGATIVE){
+                    continue;
+                }
+                checkIndivPositive = true;
                 int choose; //Lựa chọn loại localSearch
                 boolean positive = false; //Local seach có hiệu quả hay không ?
 
@@ -77,9 +83,14 @@ public class MFVNS {
                     positive = localSearch(pop.pop.get(i),cloneTypeLS.get(choose),prob.graphs.get(pop.pop.get(i).skillfactor),prob.NOVPCinCommonSpace, prob.pointCommonSpace);
                     cloneTypeLS.remove(choose);
                 }
+                if(!positive){
+                    pop.pop.get(i).countNegative++;
+                }else{
+                    pop.pop.get(i).countNegative = 0;
+                }
             }
             //--------------------------------
-            if(stop) break;
+            if(stop || !checkIndivPositive) break;
             //----------MFEA---------------
             for(int i = 0; i< Params.POP_SIZE; i++){
                 int j;

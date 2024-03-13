@@ -23,4 +23,6 @@ public class Params {
 
     public static final double C = 0.02;
 
+    public static final int MAX_NEGATIVE = 5;
+
 }

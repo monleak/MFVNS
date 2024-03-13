@@ -20,6 +20,8 @@ public class Individual  implements Comparable<Individual> {
     public int skillfactor; // Bắt đầu đếm từ 0
     public int rank;
 
+    public int countNegative;
+
     /**
      * Khởi tạo 1 cá thể mới trong không gian chung
      * @param maxTotalVertices Số chiều của NST

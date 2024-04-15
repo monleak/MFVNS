@@ -5,7 +5,7 @@ import OCSTP.benchmark.Graph;
 import OCSTP.benchmark.Problem;
 
 import java.lang.reflect.Array;
-import java.util.Arrays;
+import java.util.*;
 
 public class util {
     /**
@@ -27,6 +27,19 @@ public class util {
         }
         shuffleArray(intArray);
         return intArray;
+    }
+
+    /**
+     *
+     * @param n
+     * @return Mảng số thuc ngau nhien
+     */
+    public static double[] randDoubleArray(int n){
+        double[] doubleArray = new double[n];
+        for(int i=0;i<n;i++){
+            doubleArray[i] = Params.rand.nextDouble();
+        }
+        return doubleArray;
     }
 
     /**
@@ -117,5 +130,35 @@ public class util {
             }
         }
         return false;
+    }
+
+    public static int findMaxIndex(double[] arr) {
+        int maxIndex = 0;
+        double maxValue = arr[0];
+
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] > maxValue) {
+                maxValue = arr[i];
+                maxIndex = i;
+            }
+        }
+
+        return maxIndex;
+    }
+
+    public static <T extends Comparable<T>> List<Integer> sortIndex(List<T> in) {
+        ArrayList<Integer> index = new ArrayList<>();
+        for (int i = 0; i < in.size(); i++) {
+            index.add(i);
+        }
+
+        Collections.sort(index, new Comparator<Integer>() {
+            @Override
+            public int compare(Integer idx1, Integer idx2) {
+                return in.get(idx2).compareTo(in.get(idx1));
+            }
+        });
+
+        return index;
     }
 }

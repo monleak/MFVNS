@@ -1,29 +1,28 @@
-package CTSP.basic;
+package OCSTP.basic;
 
-import CTSP.benchmark.Problem;
+import OCSTP.benchmark.Problem;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import static CTSP.util.utilCTSP.calCost;
+import static OCSTP.util.utilOCSTP.calCost;
 
-public class CTSP_Population {
+public class OCSTP_Population {
     public Problem prob;
     public ArrayList<Individual> pop;
     public double[] best;
 
-    public CTSP_Population(Problem prob){
+    public OCSTP_Population(Problem prob){
         this.prob = prob;
         pop = new ArrayList<>();
         while (pop.size() < Params.POP_SIZE){
-            Individual individual = new Individual(prob.maxTotalVertices, prob.numberOfGraph);
-            for(int i=0;i<prob.numberOfGraph;i++){
-                individual.cost[i] = calCost(prob.graphs.get(i),individual.Chromosome,1, prob.pointCommonSpace);
+            Individual individual = new Individual(prob.maxTotalVertices, prob.graphs.size());
+            for(int i=0;i<prob.graphs.size();i++){
+                individual.cost[i] = calCost(individual,prob.graphs.get(i));
             }
             pop.add(individual);
         }
-
         this.best = new double[prob.graphs.size()];
         Arrays.fill(best,Double.MAX_VALUE);
 
@@ -41,7 +40,7 @@ public class CTSP_Population {
             pop.get(idIndiv).rank = -1;
         }
         //Set skillfactor, rank and sort pop
-        for(int task=0;task<prob.numberOfGraph;task++){
+        for(int task=0;task<prob.graphs.size();task++){
             sortPop(task);
             for(int idIndiv = 0;idIndiv < pop.size();idIndiv++){
                 if(pop.get(idIndiv).rank == -1 || pop.get(idIndiv).rank > idIndiv){

@@ -8,7 +8,7 @@ import OCSTP.benchmark.Problem;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static OCSTP.util.utilCTSP.calCost;
+import static OCSTP.util.utilOCSTP.calCost;
 
 public class MFEA {
     /**
@@ -22,11 +22,11 @@ public class MFEA {
         //TODO: fix lỗi, nhận định ban đầu là do gen của 2 cá thể truyền vào bị lỗi, cần kiểm tra lại các hàm thay đổi gen, decode, encode
         int maxTotalVertices = prob.maxTotalVertices;
         //Khởi tạo 2 cá thể con mới
-        Individual o1 = new Individual(maxTotalVertices, prob.numberOfGraph);
-        Individual o2 = new Individual(maxTotalVertices, prob.numberOfGraph);
+        Individual o1 = new Individual(maxTotalVertices, prob.graphs.size());
+        Individual o2 = new Individual(maxTotalVertices, prob.graphs.size());
 
-        int[] ChromosomeA = parentA.Chromosome.clone();
-        int[] ChromosomeB = parentB.Chromosome.clone();
+        var ChromosomeA = parentA.Chromosome.clone();
+        var ChromosomeB = parentB.Chromosome.clone();
 
         int point1,point2;
         point1 = Params.rand.nextInt(maxTotalVertices);
@@ -72,8 +72,8 @@ public class MFEA {
         o1.skillfactor = Params.rand.nextBoolean() ? parentA.skillfactor : parentB.skillfactor;
         o2.skillfactor = Params.rand.nextBoolean() ? parentA.skillfactor : parentB.skillfactor;
 
-        o1.cost[o1.skillfactor] = calCost(prob.graphs.get(o1.skillfactor), o1.Chromosome,1,prob.pointCommonSpace);
-        o2.cost[o2.skillfactor] = calCost(prob.graphs.get(o2.skillfactor), o2.Chromosome,1,prob.pointCommonSpace);
+//        o1.cost[o1.skillfactor] = calCost(prob.graphs.get(o1.skillfactor), o1.Chromosome,1,prob.pointCommonSpace);
+//        o2.cost[o2.skillfactor] = calCost(prob.graphs.get(o2.skillfactor), o2.Chromosome,1,prob.pointCommonSpace);
 
         ArrayList<Individual> child = new ArrayList<>();
         child.add(o1);child.add(o2);

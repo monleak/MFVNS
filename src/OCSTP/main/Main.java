@@ -32,16 +32,8 @@ public class Main {
         ArrayList<String> orderTask = new ArrayList<>();
         Problem newProb = new Problem(Params.linkProb,orderTask);
 
-        File typeDir = new File(Params.linkOutput+Params.linkOutputOCSTP+(Params.type == 1 ? Params.linkLarge : Params.linkSmall)+newProb.instanceName);
-        if (!typeDir.exists()) {
-            boolean check = typeDir.mkdir();
-            if(!check){
-                System.out.println("Lỗi khi tạo folder Result/OCSTP/"+(Params.type == 1 ? Params.linkLarge : Params.linkSmall)+newProb.instanceName);
-            }
-        }
-
         //in ra file
-        String orderTaskFile = typeDir.getPath()+"//"+ newProb.instanceName+"_ORDER-TASK.txt";
+        String orderTaskFile = subDir.getPath()+"//ORDER-TASK.txt";
         DataOutputStream outOrderTask = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(orderTaskFile)));
         for(int i=0;i<orderTask.size();i++){
             outOrderTask.writeBytes(orderTask.get(i));
@@ -52,7 +44,7 @@ public class Main {
         //Hoạt động chính
         for (int seed = 0; seed < Params.REPT; seed++){
             ArrayList<String> result = new ArrayList<>();
-            System.out.println("=============== " + newProb.instanceName +" Seed "+ seed +" =================");
+            System.out.println("=============== Seed "+ seed +" =================");
             Params.rand = new Random(seed);
             Params.countEvals = 0;
             Params.maxEvals = /*prob.testCase.get(testCase).length * */ Params.MAX_EVALS_PER_TESTCASE;
@@ -60,7 +52,7 @@ public class Main {
             solver.run(result);
 
             //in ra file
-            String fitnessFile = typeDir.getPath()+"//"+ newProb.instanceName+"_SEED" + (seed + 1) + ".txt";
+            String fitnessFile = subDir.getPath()+"//SEED" + (seed + 1) + ".txt";
             DataOutputStream outFit = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(fitnessFile)));
             for(int i=0;i<result.size();i++){
                 outFit.writeBytes(result.get(i));

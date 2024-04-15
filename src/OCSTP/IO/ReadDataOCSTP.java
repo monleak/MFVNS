@@ -1,15 +1,15 @@
-package CTSP.IO;
+package OCSTP.IO;
 
-import CTSP.benchmark.Graph;
+import OCSTP.benchmark.Graph;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 
-import static CTSP.IO.DataIO.readDataCTSP;
+import static OCSTP.IO.DataIO.readDataOCSTP;
 
-public class ReadDataCTSP {
-    public static ArrayList<Graph> scanCTSPfile(String path, ArrayList<String> orderTask){
+public class ReadDataOCSTP {
+    public static ArrayList<Graph> scanOCSTPfile(String path, ArrayList<String> orderTask){
         ArrayList<Graph> graphs = new ArrayList<>();
         File file = new File(path);
         File[] files = file.listFiles();
@@ -19,24 +19,16 @@ public class ReadDataCTSP {
         for (File f : files) {
             if (f.isDirectory() && f.exists()) {
                 try {
-                    graphs.addAll(scanCTSPfile(f.getPath(),orderTask));
+                    graphs.addAll(scanOCSTPfile(f.getPath(),orderTask));
                 }
                 catch (Exception e) {
                     e.printStackTrace();
-                    continue;
                 }
             }
             else if (!f.isDirectory() && f.exists()) {
                 // using file filter
                 if (filter.accept(f)) {
-//                    System.out.println(f.getPath());
-                    typeFile type = null;
-                    if(f.getName().endsWith(".clt")){
-                        type = typeFile.CLT;
-                    }else if(f.getName().endsWith(".htsp")){
-                        type = typeFile.HTSP;
-                    }
-                    graphs.add(readDataCTSP(f.getPath(),orderTask,type));
+                    graphs.add(readDataOCSTP(f.getPath(),orderTask));
                 }
             }
         }
@@ -48,7 +40,7 @@ public class ReadDataCTSP {
         @Override
         public boolean accept(File file)
         {
-            return file.getName().endsWith(".clt") || file.getName().endsWith(".htsp");
+            return file.getName().endsWith(".txt");
         }
     };
 }

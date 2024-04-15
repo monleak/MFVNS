@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class Params {
     public static int type = 2; // 1-Large  2-Small
-    public static String linkProb = "Data/b4gcgybvt6-4/Euclidean instances/Small Instances/Type_1_Small";
+    public static String linkProb = "Data/OCSTP";
     public static String linkData = "Data//";
     public static String linkOutput = "Result//";
     public static String linkOutputOCSTP = "OCSTP//";

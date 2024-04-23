@@ -19,7 +19,7 @@ public class OCSTP_Population {
         while (pop.size() < Params.POP_SIZE){
             Individual individual = new Individual(prob.maxTotalVertices, prob.graphs.size());
             for(int i=0;i<prob.graphs.size();i++){
-                individual.cost[i] = calCost(individual,prob.graphs.get(i));
+                individual.cost[i] = calCost(individual.Chromosome,prob.graphs.get(i), prob.maxTotalVertices);
             }
             pop.add(individual);
         }

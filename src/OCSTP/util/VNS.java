@@ -93,323 +93,73 @@ public class VNS {
      */
     public static boolean localSearch(Individual indiv, Graph graph, int maxTotalVertices){
         boolean positive = false;
-        double startLength = indiv.cost[indiv.skillfactor];
-        Individual newIndiv = runDSCG(indiv,200,graph, maxTotalVertices);
-        newIndiv.cost[newIndiv.skillfactor] = utilOCSTP.calCost(newIndiv,graph);
-
-        if(startLength > newIndiv.cost[newIndiv.skillfactor]){
-            indiv = newIndiv;
-            positive = true;
+        int[] decodeChrosome = new int[graph.totalVertices];
+        int countDecodeChromosome = 0;
+        for (int i = 0; i < decodeChrosome.length; i++) {
+            decodeChrosome[i] = indiv.Chromosome[i];
+        }
+        double currentCost = indiv.cost[indiv.skillfactor];
+        boolean checkPositive = false;
+        for (int i = 0; i < graph.totalVertices-1; i++) {
+            int[] newChrosome = swapPath(decodeChrosome,i);
+            double newCost = utilOCSTP.calCost(newChrosome,graph,maxTotalVertices);
+            if(newCost < currentCost){
+                decodeChrosome = newChrosome;
+                currentCost = newCost;
+                positive = true;
+                break;
+            }
+        }
+        if(positive){
+            for (int i = 0; i < decodeChrosome.length; i++) {
+                indiv.Chromosome[i] = decodeChrosome[i];
+            }
+            indiv.cost[indiv.skillfactor] = currentCost;
         }
         return positive;
     }
 
-    private static final double INIT_STEP_SIZE = 0.02;
-    private static final double EPSILON = 1E-8;
-    private static final int EVALS_PER_LINE_SEARCH = 10;
-    private static Individual runDSCG(Individual start_point, int fes, Graph graph, int maxTotalVertices) { //fes = 2000
-        double s = INIT_STEP_SIZE;
-        int evals_per_linesearch = EVALS_PER_LINE_SEARCH;
-        int dim = start_point.Chromosome.length;
-
-        Individual result = start_point.clone();
-
-        Individual[] x = new Individual[dim + 2];
-        for (int i = 0; i < x.length; i++) {
-            x[i] = new Individual(maxTotalVertices,start_point.cost.length);
-            x[i].skillfactor = start_point.skillfactor;
+    /**
+     * Biến đổi gen sử dụng 2-opt
+     *
+     * @param  path Gen ban đầu
+     * @param i,j 2 điểm để tráo đổi gen
+     * @return Gen sau khi biến đổi
+     */
+    public static int[] do_2_Opt(int[] path, int i, int j){
+        int[] x = new int[path.length];
+        int countId = 0;
+        for (int id=0;id<=i;id++){
+            x[countId++] = path[id];
         }
-
-        x[0].Chromosome = start_point.Chromosome.clone();
-        x[0].cost = start_point.cost.clone();
-
-        int direct = 1, evals = 0;
-        double[][] v = new double[dim + 1][dim];
-        double[][] a = new double[dim][dim];
-        for (int i = 0; i <= dim; i++) {
-            for (int j = 0; j < dim; j++) {
-                if (i == j) {
-                    v[i][j] = 1;
-                } else {
-                    v[i][j] = 0;
-                }
-            }
+        for (int id=j;id>=i+1;id--){
+            x[countId++] = path[id];
         }
-
-        while (true) {
-            for (int i = 0; i < dim; i++) {
-                for (int j = 0; j < dim; j++) {
-                    a[i][j] = 0;
-                }
-            }
-
-            // line search
-            while (evals < fes - evals_per_linesearch) {
-                evals += lineSearch(x[direct - 1], x[direct], EVALS_PER_LINE_SEARCH, graph, s, v[direct - 1],maxTotalVertices);
-
-                // x_fit[direct - 1] >= x_fit[direct]
-                for (int i = 1; i <= direct; i++) {
-                    for (int j = 0; j < dim; j++) {
-                        a[i - 1][j] += x[direct].Chromosome[j] - x[direct - 1].Chromosome[j];
-                    }
-                }
-
-                // update best
-                if (result.getFitness() > x[direct].getFitness()) {
-                    result.cost[result.skillfactor] = x[direct].getFitness();
-                    result.Chromosome = x[direct].Chromosome.clone();
-                }
-
-                if (direct < dim) {
-                    direct++;
-                } else {
-                    break;
-                }
-            }
-
-            if (evals >= fes || direct < dim) {
-                break;
-            }
-
-            // Eventually one more line search
-            double z[] = new double[dim];
-            double norm_z = 0;
-            for (int i = 0; i < dim; i++) {
-                z[i] = x[dim].Chromosome[i] - x[0].Chromosome[i];
-                norm_z += z[i] * z[i];
-            }
-            norm_z = Math.sqrt(norm_z);
-
-            if (norm_z == 0) {
-                x[dim + 1].Chromosome = x[dim].Chromosome.clone();
-                x[dim + 1].cost = x[dim].cost.clone();
-                // Termination criterion
-                s *= 0.1;
-                if (s <= EPSILON) {
-                    // end the search
-                    break;
-                } else {
-                    // next loop
-                    direct = 1;
-                    x[0].Chromosome = x[dim + 1].Chromosome.clone();
-                    x[0].cost = x[dim + 1].cost.clone();
-                }
-            } else {
-                for (int i = 0; i < dim; i++) {
-                    v[dim][i] = z[i] / norm_z;
-                }
-                direct = dim + 1;
-
-                int rest_eval = fes - evals;
-                int overall_ls_eval;
-                if (rest_eval < evals_per_linesearch) {
-                    overall_ls_eval = rest_eval;
-                } else {
-                    overall_ls_eval = evals_per_linesearch;
-                }
-
-                evals += lineSearch(x[direct - 1], x[direct], overall_ls_eval, graph, s, v[direct - 1],maxTotalVertices);
-
-                // update best
-                if (result.getFitness() > x[direct].getFitness()) {
-                    result.cost[result.skillfactor] = x[direct].getFitness();
-                    result.Chromosome = x[direct].Chromosome.clone();
-                }
-
-                // Check appropriateness of step length
-                norm_z = 0;
-                for (int i = 0; i < dim; i++) {
-                    double tmp = x[direct].Chromosome[i] - x[0].Chromosome[i];
-                    norm_z += tmp * tmp;
-                }
-                norm_z = Math.sqrt(norm_z);
-
-                if (norm_z < s) {
-                    // Termination criterion
-                    s *= 0.1;
-                    if (s <= EPSILON) {
-                        // end the search
-                        break;
-                    } else {
-                        // next loop
-                        direct = 1;
-
-                        x[0].Chromosome = x[dim + 1].Chromosome.clone();
-                        x[0].cost = x[dim + 1].cost.clone();
-                    }
-                } else {
-                    // Orthogonalization
-                    // v = GramSchmidtOrthogonalization(v, a);
-
-                    direct = 2;
-                    x[0].Chromosome = x[dim].Chromosome.clone();
-                    x[1].Chromosome = x[dim + 1].Chromosome.clone();
-
-                    x[0].cost = x[dim].cost.clone();
-                    x[1].cost = x[dim + 1].cost.clone();
-                }
-            }
+        for(int id=j+1;id<path.length;id++){
+            x[countId++] = path[id];
         }
-
-        if (result.getFitness() > x[dim + 1].getFitness()) {
-            result = x[dim + 1];
-        }
-
-        return result;
+        return x;
     }
 
-    private static int lineSearch(Individual start_point, Individual result, int fes, Graph graph, double step_size, double[] v, int maxTotalVertices) {
-        int evals = 0;
-        int dim = start_point.Chromosome.length;
-        double s = step_size;
-        boolean change;
-        boolean interpolation_flag = false;
-        Individual x0 = new Individual(maxTotalVertices,start_point.cost.length);
-        Individual x = new Individual(maxTotalVertices,start_point.cost.length);
-        x.skillfactor = start_point.skillfactor;
-        x0.skillfactor = start_point.skillfactor;
-
-        for (int i = 0; i < dim; i++) {
-            x0.Chromosome[i] = start_point.Chromosome[i];
-            x.Chromosome[i] = start_point.Chromosome[i] + s * v[i];
+    /**
+     * Biến đổi gen sử dụng swap
+     *
+     * @param  path Gen ban đầu
+     * @param i điểm để tráo đổi gen
+     * @return Gen sau khi biến đổi
+     */
+    public static int[] swapPath(int[] path, int i){
+        int[] tempPath = path.clone();
+        int temp;
+        if(i == tempPath.length-1){
+            temp = tempPath[i];
+            tempPath[i] = tempPath[0];
+            tempPath[0] = temp;
+        }else {
+            temp = tempPath[i];
+            tempPath[i] = tempPath[i+1];
+            tempPath[i+1] = temp;
         }
-        x0.cost = start_point.cost.clone();
-        x.cost[start_point.skillfactor] = utilOCSTP.calCost(x,graph);
-        evals++;
-
-        // For Lagrangian quadratic interpolation
-        double F[] = new double[3];
-        Individual interpolation_points[] = new Individual[3];
-        for (int i = 0; i < 3; i++) {
-            interpolation_points[i] = new Individual(maxTotalVertices,start_point.cost.length);
-        }
-
-        // x1, x2 of for the Lagrangian quadratic interpolation
-        interpolation_points[0].Chromosome = x0.Chromosome.clone();
-        interpolation_points[1].Chromosome = x.Chromosome.clone();
-        F[0] = x0.cost[x0.skillfactor];
-        F[1] = x.cost[x.skillfactor];
-
-        // Step backward
-        if (x.getFitness() > x0.getFitness()) {
-            for (int i = 0; i < dim; i++) {
-                x.Chromosome[i] = x.Chromosome[i] - 2 * s * v[i];
-            }
-            s = -s;
-
-            x.cost[x.skillfactor] = utilOCSTP.calCost(x,graph);
-            evals++;
-
-            if (x.getFitness() <= x0.getFitness()) {
-                change = true;
-
-                // update x1 and x2 for the Lagrangian quadratic interpolation
-                interpolation_points[0].Chromosome = x0.Chromosome.clone();
-                interpolation_points[1].Chromosome = x.Chromosome.clone();
-                F[0] = x0.getFitness();
-                F[1] = x.getFitness();
-            } else {
-                change = false;
-                interpolation_flag = true;
-
-                // x1, x2, x3 for the Lagrangian quadratic interpolation
-                interpolation_points[2].Chromosome = interpolation_points[1].Chromosome.clone();
-                interpolation_points[1].Chromosome = interpolation_points[0].Chromosome.clone();
-                interpolation_points[0].Chromosome = x.Chromosome.clone();
-
-                F[2] = F[1];
-                F[1] = F[0];
-                F[0] = x.getFitness();
-            }
-        } else {
-            // activate further steps
-            change = true;
-        }
-
-        // Further steps
-        while (change) {
-            s *= 2;
-
-            for (int i = 0; i < dim; i++) {
-                x0.Chromosome[i] = x.Chromosome[i];
-                x.Chromosome[i] = x0.Chromosome[i] + s * v[i];
-            }
-
-            x0.cost = x.cost.clone();
-            x.cost[x.skillfactor] = utilOCSTP.calCost(x,graph);
-            evals++;
-
-            if (x.getFitness() < x0.getFitness()) {
-                // update x1 and x2 for the Lagrangian quadratic interpolation
-                interpolation_points[0].Chromosome = x0.Chromosome.clone();
-                interpolation_points[1].Chromosome = x.Chromosome.clone();
-                F[0] = x0.getFitness();
-                F[1] = x.getFitness();
-            } else {
-                change = false;
-                interpolation_flag = true;
-
-                // x3 = x
-                interpolation_points[2].Chromosome = x.Chromosome.clone();
-                F[2] = x.getFitness();
-
-                // generate x = x0 + 0.5s
-                s *= 0.5;
-                for (int i = 0; i < dim; i++) {
-                    x.Chromosome[i] = x0.Chromosome[i] + s * v[i];
-                }
-                x.cost[x.skillfactor] = utilOCSTP.calCost(x,graph);
-                evals++;
-
-                // reject the one which is furthest from the point that has the smallest value
-                // of the objective function
-                if (x.getFitness() > F[1]) {
-                    // x2 is smallest
-                    // reject x3, new x3 = x
-                    interpolation_points[2].Chromosome = x.Chromosome.clone();
-                    F[2] = x.getFitness();
-                } else {
-                    // x is smallest
-                    // reject current x1, new x1 = x2, new x2 = x
-                    for (int i = 0; i < dim; i++) {
-                        interpolation_points[0].Chromosome[i] = interpolation_points[1].Chromosome[i];
-                        interpolation_points[1].Chromosome[i] = x.Chromosome[i];
-                    }
-                    F[0] = F[1];
-                    F[1] = x.getFitness();
-                }
-            }
-
-            if (evals >= fes - 2) {
-                change = false;
-            }
-        }
-
-        // Lagrangian quadratic interpolation
-        if (interpolation_flag && (F[0] - 2 * F[1] + F[2] != 0)) {
-            // x = x2 + Lagrangian quadratic interpolation
-            for (int i = 0; i < dim; i++) {
-                x.Chromosome[i] = interpolation_points[1].Chromosome[i] + s * (F[0] - F[2]) / (2.0 * (F[0] - 2 * F[1] + F[2]));
-            }
-            x.cost[x.skillfactor] = utilOCSTP.calCost(x,graph);
-            evals++;
-
-            if (x.getFitness() < F[1]) {
-                // best found = Lagrangian quadratic interpolation point
-                result.Chromosome = x.Chromosome.clone();
-                result.cost = x.cost.clone();
-                result.skillfactor = x.skillfactor;
-            } else {
-                // best found = x2
-                result.Chromosome = interpolation_points[1].Chromosome.clone();
-                result.cost[result.skillfactor] = F[1];
-            }
-        } else {
-            // best found = x2
-            result.Chromosome = interpolation_points[1].Chromosome.clone();
-            result.cost[result.skillfactor] = F[1];
-        }
-
-        return evals;
+        return tempPath;
     }
 }

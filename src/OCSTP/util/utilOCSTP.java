@@ -8,40 +8,92 @@ import java.util.Arrays;
 import java.util.List;
 
 public class utilOCSTP {
-    public static double calCost(Individual indiv, Graph graph){
-        ArrayList<Integer> IDVertexUsed = new ArrayList<>();
+    public static double calCost(int[] Chromosome, Graph graph, int maxTotalVertices){
+//        ArrayList<Integer> IDVertexUsed = new ArrayList<>();
+//        ArrayList<ArrayList<Integer>> tree = new ArrayList<>();
+//        for(int d = 0; d <= graph.totalVertices; d++) {
+//            tree.add(new ArrayList<Integer>());
+//        }
+//
+//        ArrayList<Double> chomosome =  new ArrayList<>();
+//        for(var d : indiv.Chromosome){
+//            chomosome.add(d);
+//        }
+//        List<Integer> edges = util.sortIndex(chomosome);
+//        int totalEdges = graph.totalVertices*(graph.totalVertices-1)/2;
+//        for(var edge : edges){ //edge tinh tu 0
+//            if(edge+1 > totalEdges){
+//                continue;
+//            }
+//            int[] rowCol = getIDVertexFromPointEdge(edge+1, graph.totalVertices);
+//            if(IDVertexUsed.size() == 0
+//              || (IDVertexUsed.contains(rowCol[0]) && !IDVertexUsed.contains(rowCol[1]))
+//              || (IDVertexUsed.contains(rowCol[1]) && !IDVertexUsed.contains(rowCol[0]))
+//            ){
+//                if(!IDVertexUsed.contains(rowCol[0])){
+//                    IDVertexUsed.add(rowCol[0]);
+//                }else if(!IDVertexUsed.contains(rowCol[1])){
+//                    IDVertexUsed.add(rowCol[1]);
+//                }
+//                tree.get(rowCol[1]).add(rowCol[0]);
+//                tree.get(rowCol[0]).add(rowCol[1]);
+//            }
+//            if (IDVertexUsed.size() >= graph.totalVertices){
+//                break;
+//            }
+//        }
         ArrayList<ArrayList<Integer>> tree = new ArrayList<>();
         for(int d = 0; d <= graph.totalVertices; d++) {
-            tree.add(new ArrayList<Integer>());
+            tree.add(new ArrayList<>());
         }
 
-        ArrayList<Double> chomosome =  new ArrayList<>();
-        for(var d : indiv.Chromosome){
-            chomosome.add(d);
+        ArrayList<ArrayList<Integer>> rows = new ArrayList<>();
+        for (int i = 0; i < maxTotalVertices; i++) {
+            rows.add(new ArrayList<>());
         }
-        List<Integer> edges = util.sortIndex(chomosome);
-        int totalEdges = graph.totalVertices*(graph.totalVertices-1)/2;
-        for(var edge : edges){ //edge tinh tu 0
-            if(edge+1 > totalEdges){
+
+        int totalVerticeOfGraph = graph.totalVertices;
+        for (int i = 0; i < totalVerticeOfGraph; i++) {
+            int row = Chromosome[i]/maxTotalVertices;
+            rows.get(row).add(i);
+        }
+
+        for (int i = 0; i < maxTotalVertices; i++) {
+            if(rows.get(i).isEmpty()){
                 continue;
             }
-            int[] rowCol = getIDVertexFromPointEdge(edge+1, graph.totalVertices);
-            if(IDVertexUsed.size() == 0
-              || (IDVertexUsed.contains(rowCol[0]) && !IDVertexUsed.contains(rowCol[1]))
-              || (IDVertexUsed.contains(rowCol[1]) && !IDVertexUsed.contains(rowCol[0]))
-            ){
-                if(!IDVertexUsed.contains(rowCol[0])){
-                    IDVertexUsed.add(rowCol[0]);
-                }else if(!IDVertexUsed.contains(rowCol[1])){
-                    IDVertexUsed.add(rowCol[1]);
+            ArrayList<Integer> currentRow = rows.get(i);
+            ArrayList<Integer> nextRow = null;
+            for (int j = i+1; j < maxTotalVertices; j++) {
+                if(rows.get(j).isEmpty()){
+                    continue;
                 }
-                tree.get(rowCol[1]).add(rowCol[0]);
-                tree.get(rowCol[0]).add(rowCol[1]);
-            }
-            if (IDVertexUsed.size() >= graph.totalVertices){
+                nextRow = rows.get(j);
                 break;
             }
+
+            if(nextRow == null){
+                for (int j = 0; j < currentRow.size()-1; j++) {
+                    tree.get(currentRow.get(j)+1).add(currentRow.get(j+1)+1);
+                    tree.get(currentRow.get(j+1)+1).add(currentRow.get(j)+1);
+                }
+                break;
+            }
+
+            for (var Start : currentRow){
+                int index = -1;
+                double minDis = Double.MAX_VALUE;
+                for (int j = 0; j < nextRow.size(); j++) {
+                    if(minDis > graph.distance[Start][nextRow.get(j)]){
+                        minDis = graph.distance[Start][nextRow.get(j)];
+                        index = j;
+                    }
+                }
+                tree.get(Start+1).add(nextRow.get(index)+1);
+                tree.get(nextRow.get(index)+1).add(Start+1);
+            }
         }
+
         double costAll = 0;
         for (int i = 0; i < graph.reqs.length; i++) {
             for (int j = 0; j < graph.reqs[i].length; j++) {
@@ -76,10 +128,6 @@ public class utilOCSTP {
         }
         col+=row;
         return new int[]{row,col};
-    }
-
-    public static void DFS(int start, int end, ArrayList<ArrayList<Integer>> tree){
-
     }
 
     private static void DFS(boolean vis[], int x, int y, ArrayList<Integer> stack, ArrayList<ArrayList<Integer>> v,ArrayList<Integer> path) {

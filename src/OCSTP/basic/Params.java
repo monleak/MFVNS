@@ -10,7 +10,7 @@ public class Params {
     public static String linkOutputOCSTP = "OCSTP//";
     public static String linkLarge = "Large//";
     public static String linkSmall = "Small//";
-    public static int POP_SIZE= 500;
+    public static int POP_SIZE= 200;
     public static int kmax = 4;
     public static Random rand; //Được khởi tạo theo các seed
     public static double countEvals; //Đếm số lần đánh giá

@@ -42,7 +42,7 @@ public class Main {
         outOrderTask.close();
 
         //Hoạt động chính
-        for (int seed = 0; seed < Params.REPT; seed++){
+        for (int seed = 14; seed < Params.REPT; seed++){
             ArrayList<String> result = new ArrayList<>();
             System.out.println("=============== Seed "+ seed +" =================");
             Params.rand = new Random(seed);

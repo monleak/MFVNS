@@ -1,0 +1,11 @@
+Reading data from Data\OCSTP\Berry_35.txt DONE
+Reading data from Data\OCSTP\Berry_35u.txt DONE
+Reading data from Data\OCSTP\Berry_6.txt DONE
+Reading data from Data\OCSTP\Palmer_12.txt DONE
+Reading data from Data\OCSTP\Palmer_24.txt DONE
+Reading data from Data\OCSTP\Palmer_6.txt DONE
+Reading data from Data\OCSTP\Raidl_10.txt DONE
+Reading data from Data\OCSTP\Raidl_100.txt DONE
+Reading data from Data\OCSTP\Raidl_20.txt DONE
+Reading data from Data\OCSTP\Raidl_50.txt DONE
+Reading data from Data\OCSTP\Raidl_75.txt DONE

@@ -8,7 +8,7 @@ import OCSTP.benchmark.Problem;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static OCSTP.util.MFEA.SBX;
+import static OCSTP.util.MFEA.Crossover;
 import static OCSTP.util.VNS.localSearch;
 import static OCSTP.util.util.*;
 import static OCSTP.util.util.giveId;
@@ -78,40 +78,40 @@ public class MFVNS {
             if(stop || !checkIndivPositive) break;
 
             //----------MFEA---------------
-//            for(int i = 0; i< Params.POP_SIZE; i++){
-//                int j;
-//                do{
-//                    j = Params.rand.nextInt(pop.pop.size());
-//                }while (j==i);
-//
-//                if(pop.pop.get(i).skillfactor == pop.pop.get(j).skillfactor){
-//                    ArrayList<Individual> child = SBX(pop.pop.get(i),pop.pop.get(j),prob);
-//                    pop.pop.addAll(child);
-//                }else {
-//                    double currentRmp = rmp[giveId(pop.pop.get(i).skillfactor,pop.pop.get(j).skillfactor,prob)];
-//                    if(Params.rand.nextDouble() < currentRmp){
-//                        ArrayList<Individual> child = SBX(pop.pop.get(i),pop.pop.get(j),prob);
-//                        for(int o=0;o<child.size();o++){
-//                            double delta;
-//
-//                            if(child.get(o).skillfactor == pop.pop.get(i).skillfactor){
-//                                delta = pop.pop.get(i).cost[pop.pop.get(i).skillfactor] - child.get(o).cost[pop.pop.get(i).skillfactor];
-//                            }else{
-//                                delta = pop.pop.get(j).cost[pop.pop.get(j).skillfactor] - child.get(o).cost[pop.pop.get(j).skillfactor];
-//                            }
-//
-//                            if(delta == 0){
-//                                pop.pop.add(child.get(o));
-//                            }else if(delta > 0){
-//                                s_rmp[giveId(pop.pop.get(i).skillfactor,pop.pop.get(j).skillfactor,prob)].add(currentRmp);
-//                                diff_f_inter_x[giveId(pop.pop.get(i).skillfactor,pop.pop.get(j).skillfactor,prob)].add(delta);
-//                                pop.pop.add(child.get(o));
-//                            }
-//                        }
-//                    }
-//                }
-//
-//            }
+            for(int i = 0; i< Params.POP_SIZE; i++){
+                int j;
+                do{
+                    j = Params.rand.nextInt(pop.pop.size());
+                }while (j==i);
+
+                if(pop.pop.get(i).skillfactor == pop.pop.get(j).skillfactor){
+                    ArrayList<Individual> child = Crossover(pop.pop.get(i),pop.pop.get(j),prob);
+                    pop.pop.addAll(child);
+                }else {
+                    double currentRmp = rmp[giveId(pop.pop.get(i).skillfactor,pop.pop.get(j).skillfactor,prob)];
+                    if(Params.rand.nextDouble() < currentRmp){
+                        ArrayList<Individual> child = Crossover(pop.pop.get(i),pop.pop.get(j),prob);
+                        for(int o=0;o<child.size();o++){
+                            double delta;
+
+                            if(child.get(o).skillfactor == pop.pop.get(i).skillfactor){
+                                delta = pop.pop.get(i).cost[pop.pop.get(i).skillfactor] - child.get(o).cost[pop.pop.get(i).skillfactor];
+                            }else{
+                                delta = pop.pop.get(j).cost[pop.pop.get(j).skillfactor] - child.get(o).cost[pop.pop.get(j).skillfactor];
+                            }
+
+                            if(delta == 0){
+                                pop.pop.add(child.get(o));
+                            }else if(delta > 0){
+                                s_rmp[giveId(pop.pop.get(i).skillfactor,pop.pop.get(j).skillfactor,prob)].add(currentRmp);
+                                diff_f_inter_x[giveId(pop.pop.get(i).skillfactor,pop.pop.get(j).skillfactor,prob)].add(delta);
+                                pop.pop.add(child.get(o));
+                            }
+                        }
+                    }
+                }
+
+            }
             //------------------------------------
 
             update();
